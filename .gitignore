@@ -43,3 +43,4 @@ next-env.d.ts
 # Fichiers Prisma générés
 prisma/migrations/
 prisma/dev.db
+.vercel
