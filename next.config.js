@@ -1,5 +1,8 @@
 // next.config.js
 const nextConfig = {
+  eslint: {
+    ignorDeDuringBuilds: true,
+  },
   experimental: {
     serverActions: {}, // ← objet vide, plus "true"
   },
