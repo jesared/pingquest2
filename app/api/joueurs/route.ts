@@ -19,7 +19,11 @@ export async function GET(request: Request) {
         userClerkId: userClerkId,
       },
       include: {
-        Engagement: true, // 👈 Optionnel : pour ramener aussi les engagements
+        engagement: {
+          include: {
+            event: true,
+          },
+        },
       },
     });
 

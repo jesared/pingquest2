@@ -2,19 +2,29 @@
 
 interface DeleteJoueurButtonProps {
   joueurId: number;
+  onDelete: (id: number) => void; // 👈 on passe une fonction à appeler après suppression
 }
 
-export function DeleteJoueurButton({ joueurId }: DeleteJoueurButtonProps) {
+export function DeleteJoueurButton({
+  joueurId,
+  onDelete,
+}: DeleteJoueurButtonProps) {
   const handleDelete = async () => {
     if (confirm("Es-tu sûr de vouloir supprimer ce joueur ?")) {
-      const res = await fetch(`/api/joueurs/${joueurId}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        window.location.reload(); // Ou bien tu peux utiliser Router.refresh() si tu veux éviter window.location
-      } else {
-        alert("Erreur lors de la suppression");
-        console.log(res);
+      try {
+        const res = await fetch(`/api/joueurs/${joueurId}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          throw new Error("Erreur lors de la suppression");
+        }
+
+        // Appeler le callback pour mettre à jour la liste côté parent
+        onDelete(joueurId);
+      } catch (error) {
+        console.error("Erreur suppression:", error);
+        alert("Erreur lors de la suppression !");
       }
     }
   };

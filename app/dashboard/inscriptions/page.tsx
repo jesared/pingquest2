@@ -1,5 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+"use client";
 
 import { DeleteJoueurButton } from "@/app/components/DeletedJoueurButton";
 import { Badge } from "@/components/ui/badge";
@@ -11,21 +10,46 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getJoueursByUser } from "@/lib/data";
+import { useUser } from "@clerk/nextjs";
 import { Trash } from "lucide-react";
+import { useEffect, useState } from "react";
 
-// Importez depuis lib/data
-
-export default async function Page() {
-  const { userId } = await auth();
-  if (!userId) {
-    redirect("/sign-in");
+export default function Page() {
+  const { user } = useUser();
+  interface Joueur {
+    id: number;
+    dossard: string;
+    numeroLicence: string;
+    nom: string;
+    prenom: string;
+    club: string;
+    engagement: {
+      id: string;
+      event: {
+        tableau: string;
+        id: string;
+      };
+    }[];
   }
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
-  const joueurs = await getJoueursByUser(userId);
+  const [players, setPlayers] = useState<Joueur[]>([]);
+
+  useEffect(() => {
+    async function fetchPlayers() {
+      if (user) {
+        const res = await fetch(`/api/joueurs?userClerkId=${user.id}`);
+        const data = await res.json();
+        setPlayers(data.joueurs || []);
+      }
+    }
+    fetchPlayers();
+  }, [user]);
+
+  // Fonction qui met à jour le tableau en supprimant le joueur localement
+  const handleDelete = (id: number) => {
+    setPlayers((prev) => prev.filter((player) => player.id !== id));
+  };
+
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="mx-auto text-center ml-4">
@@ -35,7 +59,7 @@ export default async function Page() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-gray-500 ">
+                <TableHead className="text-gray-500">
                   <Trash className="h-4 w-4 text-center" />
                 </TableHead>
                 <TableHead className="text-gray-500 text-center">
@@ -57,10 +81,13 @@ export default async function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {joueurs.map((joueur) => (
+              {players.map((joueur) => (
                 <TableRow key={joueur.id}>
                   <TableCell>
-                    <DeleteJoueurButton joueurId={joueur.id} />
+                    <DeleteJoueurButton
+                      joueurId={joueur.id}
+                      onDelete={handleDelete}
+                    />
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{joueur.dossard}</Badge>
@@ -69,7 +96,7 @@ export default async function Page() {
                   <TableCell>{joueur.nom}</TableCell>
                   <TableCell>{joueur.prenom}</TableCell>
                   <TableCell>
-                    <code className="relative rounded  px-[0.3rem] py-[0.2rem] font-mono text-xs ">
+                    <code className="relative rounded px-[0.3rem] py-[0.2rem] font-mono text-xs">
                       {joueur.club}
                     </code>
                   </TableCell>
@@ -87,10 +114,10 @@ export default async function Page() {
                   </TableCell>
                 </TableRow>
               ))}
-              {joueurs.length === 0 && (
+              {players.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={7}
                     className="border border-gray-200 p-2 text-center"
                   >
                     Aucun joueur trouvé
