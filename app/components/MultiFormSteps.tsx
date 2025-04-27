@@ -33,6 +33,7 @@ export default function MultiStepForm() {
     jour: string;
     minPoints: number;
     maxPoints: number;
+    epreuves: string[];
   }
   const [successMessage, setSuccessMessage] = useState(false);
 
@@ -137,9 +138,11 @@ export default function MultiStepForm() {
         const res = await fetch("/api/epreuves"); // 👈 Ton endpoint API qui sort les épreuves
         const allEpreuves = await res.json();
 
-        const accessibles = allEpreuves.filter((e: any) => {
-          return points >= e.minPoints && points <= e.maxPoints;
-        });
+        const accessibles = allEpreuves.filter(
+          (e: { minPoints: number; maxPoints: number }) => {
+            return points >= e.minPoints && points <= e.maxPoints;
+          }
+        );
 
         setEpreuves(accessibles);
       } catch (err) {

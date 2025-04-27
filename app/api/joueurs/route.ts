@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         userClerkId: userClerkId,
       },
       include: {
-        engagements: true, // 👈 Optionnel : pour ramener aussi les engagements
+        Engagement: true, // 👈 Optionnel : pour ramener aussi les engagements
       },
     });
 

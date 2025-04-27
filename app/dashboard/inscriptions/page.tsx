@@ -12,41 +12,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import prisma from "@/lib/prisma";
+import { getJoueursByUser } from "@/lib/data";
 
-export async function getJoueursByUser(userClerkId: string) {
-  try {
-    const joueurs = await prisma.joueur.findMany({
-      where: {
-        userClerkId: userClerkId, // userClerkId passé dans ta route
-      },
-      include: {
-        Engagement: {
-          // attention, dans ton modèle c'est "Engagement" (majuscule !)
-          include: {
-            event: true, // pour avoir les infos de l'épreuve liée
-          },
-        },
-      },
-    });
-    return joueurs;
-  } catch (error) {
-    console.error("Erreur getJoueursByUser:", error);
-    throw new Error("Impossible de récupérer les joueurs");
-  }
-}
+// Importez depuis lib/data
 
 export default async function Page() {
   const { userId } = await auth();
   if (!userId) {
     redirect("/sign-in");
   }
-  const joueurs = await getJoueursByUser(userId);
 
   if (!userId) {
     redirect("/sign-in");
   }
-
+  const joueurs = await getJoueursByUser(userId);
   return (
     <div className="flex items-center justify-center flex-col">
       <div className="mx-auto text-center ml-4">
