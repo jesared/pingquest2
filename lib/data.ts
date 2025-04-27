@@ -47,6 +47,14 @@ export async function getJoueursByUser(userClerkId: string): Promise<Joueur[]> {
     return joueurs;
   } catch (error) {
     console.error("Erreur getJoueursByUser:", error);
-    throw new Error("Impossible de récupérer les joueurs");
+    if (error instanceof Error) {
+      throw new Error(`Impossible de récupérer les joueurs: ${error.message}`);
+    } else {
+      throw new Error(
+        "Impossible de récupérer les joueurs: une erreur inconnue s'est produite."
+      );
+    }
+  } finally {
+    await prisma.$disconnect(); // Ferme la connexion
   }
 }
