@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Supabase te fournit ça
+}
+
+model User {
+  id            String   @id @default(uuid())
+  nom           String
+  prenom        String
+  email         String @unique
+  description   String
+  url_github    String?
+  url_youtube   String?
+  url_site      String?
+  job           String
+  technologies  String   
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  joueurs       Joueur[]
+}
+
+model Joueur {
+  id             Int      @id @default(autoincrement())
+  dossard        Int   @unique
+  numeroLicence  String @unique
+  nom            String
+  prenom         String
+  email          String?  @unique
+  mobile         String?
+  club           String?
+  pointsOfficiel Float?
+  userClerkId    String?  // Ajout du champ userClerkId pour stocker l'ID de l'utilisateur Clerk
+  createdAt      DateTime @default(now())
+
+  Engagement Engagement[]
+
+  User User[]
+}
+
+
+model Event {
+  id            Int           @id @default(autoincrement())
+  nom           String
+  date          DateTime
+  jour          String        // Jour de la semaine (ex: "Lundi", "Mardi", etc.)
+  heure         String        // Ajout de l'heure de l'événement
+  tableau       String        // Nom du tableau (A, B, C, etc.)
+  categorie     String?       // Catégorie de points (ex: "800 à 1399 pts", "500 à N°400", "Dames TC")
+  minPoints     Int?          // Points minimum requis (nullable, pas de minimum pour NC)
+  maxPoints     Int?          // Points maximum requis (nullable)
+  prixAnticipe  Float         // Prix en cas de paiement anticipé
+  prixSurPlace  Float         // Prix en cas de paiement sur place
+  engagements   Engagement[]
+
+  @@unique([date, heure, tableau]) // Assure l'unicité d'un événement spécifique
+}
+
+model Engagement {
+  id             Int      @id @default(autoincrement())
+  joueurId       Int
+  joueur         Joueur   @relation(fields: [joueurId], references: [id])
+  eventId        Int
+  event          Event    @relation(fields: [eventId], references: [id])
+  dateEngagement DateTime @default(now()) // Date de l'engagement
+  modePaiement   String?  // "Anticipé" ou "Sur place" (optionnel, peut être géré autrement)
+
+  @@unique([joueurId, eventId]) // Un joueur ne peut s'engager qu'une seule fois au même événement
+}
