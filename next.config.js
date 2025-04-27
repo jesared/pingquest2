@@ -1,7 +1,7 @@
 // next.config.js
 const nextConfig = {
   eslint: {
-    ignorDeDuringBuilds: true,
+    ignoreDuringBuilds: true, // Ignore les erreurs ESLint pendant le build
   },
   experimental: {
     serverActions: {}, // ← objet vide, plus "true"
