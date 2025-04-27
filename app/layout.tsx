@@ -2,6 +2,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "./components/AppSidebar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,14 +20,14 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          {/* <SidebarProvider className="flex h-screen "> */}
-          {/* <AppSidebar /> */}
-          <Toaster richColors position="top-center" />
-          <main>
-            {/* <SidebarTrigger /> */}
-            {children}
-          </main>
-          {/* </SidebarProvider> */}
+          <SidebarProvider className="flex h-screen ">
+            <AppSidebar />
+            <Toaster richColors position="top-center" />
+            <main>
+              <SidebarTrigger />
+              {children}
+            </main>
+          </SidebarProvider>
         </body>
       </html>
     </ClerkProvider>
