@@ -3,8 +3,9 @@
 import {
   Home,
   LogIn,
-  Search,
   Settings,
+  ShieldCheck,
+  Star,
   Trophy,
   User,
   UserPlus,
@@ -41,9 +42,14 @@ const items = [
     icon: Users,
   },
   {
-    title: "Search",
-    url: "#",
-    icon: Search,
+    title: "Les épreuves",
+    url: "/epreuves",
+    icon: Star,
+  },
+  {
+    title: "Les participants",
+    url: "/participants",
+    icon: ShieldCheck,
   },
   {
     title: "Settings",

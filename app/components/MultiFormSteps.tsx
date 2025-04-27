@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
 import confetti from "canvas-confetti";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -24,6 +25,8 @@ export default function MultiStepForm() {
   const router = useRouter();
   const [loadingFftt, setLoadingFftt] = useState(false);
   const [licenceVerrouillee, setLicenceVerrouillee] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   interface Epreuve {
     categorie: string;
@@ -133,6 +136,7 @@ export default function MultiStepForm() {
   useEffect(() => {
     const fetchEpreuves = async () => {
       try {
+        setLoading(true);
         const points = parseInt(watch("pointsOfficiel") || "0", 10);
 
         const res = await fetch("/api/epreuves"); // 👈 Ton endpoint API qui sort les épreuves
@@ -146,7 +150,10 @@ export default function MultiStepForm() {
 
         setEpreuves(accessibles);
       } catch (err) {
-        console.error("Erreur chargement épreuves:", err);
+        setError("Erreur lors du chargement des épreuves");
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -262,102 +269,127 @@ export default function MultiStepForm() {
                     )}
                   </>
                 )}
-                <Button
-                  type="button"
-                  className="w-full"
-                  onClick={() => validateStep(2)}
-                >
-                  Suivant
-                </Button>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-8">
-                <h2 className="text-2xl font-bold ">Choix des épreuves</h2>
-
-                <div className="grid grid-cols-3 gap-4">
-                  {/* Colonne Samedi */}
-                  <div>
-                    <h3 className="text-lg font-semibold  mb-2">Samedi</h3>
-                    <div className="flex flex-col gap-1">
-                      {epreuves
-                        .filter((e) => e.jour === "samedi")
-                        .map((e) => (
-                          <label key={e.id} className="flex items-center gap-2">
-                            <Input
-                              type="checkbox"
-                              value={e.id}
-                              {...register("epreuves")}
-                              className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
-                            />
-
-                            <span className="ml-1">
-                              {e.tableau} ({e.categorie})
-                            </span>
-                          </label>
-                        ))}
-                    </div>
-                  </div>
-                  {/* Colonne Dimanche */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Dimanche</h3>
-                    <div className="flex flex-col gap-1">
-                      {epreuves
-                        .filter((e) => e.jour === "dimanche")
-                        .map((e) => (
-                          <label key={e.id} className="flex items-center gap-2">
-                            <Input
-                              type="checkbox"
-                              value={e.id}
-                              {...register("epreuves")}
-                              className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
-                            />
-                            <span className="ml-2">
-                              {e.tableau} ({e.categorie})
-                            </span>
-                          </label>
-                        ))}
-                    </div>
-                  </div>
-
-                  {/* Colonne Lundi */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Lundi</h3>
-                    <div className="flex flex-col gap-1">
-                      {epreuves
-                        .filter((e) => e.jour === "lundi")
-                        .map((e) => (
-                          <label
-                            key={e.id}
-                            className="flex items-center gap-2 "
-                          >
-                            <Input
-                              type="checkbox"
-                              value={e.id}
-                              {...register("epreuves")}
-                              className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
-                            />
-                            <span className="ml-2">
-                              {e.tableau} ({e.categorie})
-                            </span>
-                          </label>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <Button type="button" onClick={() => setStep(1)}>
-                    Précédent
-                  </Button>
-                  <Button type="button" onClick={() => validateStep(3)}>
+                {/* Montre le bouton uniquement si le nom a été récupéré */}
+                {watch("pointsOfficiel") && (
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={() => validateStep(2)}
+                  >
                     Suivant
                   </Button>
-                </div>
+                )}
               </div>
             )}
+            <>
+              {step === 2 && (
+                <div className="space-y-8">
+                  <h2 className="text-2xl font-bold ">Choix des épreuves</h2>
+                  {/* prevoir un chargement des épruves */}
+                  {loading ? (
+                    <div className="flex justify-center items-center">
+                      <p className="text-gray-500">
+                        Chargement des épreuves...
+                      </p>
+                      <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                    </div>
+                  ) : error ? (
+                    <p className="text-red-500">{error}</p>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-3 gap-4">
+                        {/* Colonne Samedi */}
+                        <div>
+                          <h3 className="text-lg font-semibold  mb-2">
+                            Samedi
+                          </h3>
+                          <div className="flex flex-col gap-1">
+                            {epreuves
+                              .filter((e) => e.jour === "samedi")
+                              .map((e) => (
+                                <label
+                                  key={e.id}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Input
+                                    type="checkbox"
+                                    value={e.id}
+                                    {...register("epreuves")}
+                                    className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
+                                  />
 
+                                  <span className="ml-1">
+                                    {e.tableau} ({e.categorie})
+                                  </span>
+                                </label>
+                              ))}
+                          </div>
+                        </div>
+                        {/* Colonne Dimanche */}
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2">
+                            Dimanche
+                          </h3>
+                          <div className="flex flex-col gap-1">
+                            {epreuves
+                              .filter((e) => e.jour === "dimanche")
+                              .map((e) => (
+                                <label
+                                  key={e.id}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Input
+                                    type="checkbox"
+                                    value={e.id}
+                                    {...register("epreuves")}
+                                    className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
+                                  />
+                                  <span className="ml-2">
+                                    {e.tableau} ({e.categorie})
+                                  </span>
+                                </label>
+                              ))}
+                          </div>
+                        </div>
+
+                        {/* Colonne Lundi */}
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2">Lundi</h3>
+                          <div className="flex flex-col gap-1">
+                            {epreuves
+                              .filter((e) => e.jour === "lundi")
+                              .map((e) => (
+                                <label
+                                  key={e.id}
+                                  className="flex items-center gap-2 "
+                                >
+                                  <Input
+                                    type="checkbox"
+                                    value={e.id}
+                                    {...register("epreuves")}
+                                    className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
+                                  />
+                                  <span className="ml-2">
+                                    {e.tableau} ({e.categorie})
+                                  </span>
+                                </label>
+                              ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <Button type="button" onClick={() => setStep(1)}>
+                          Précédent
+                        </Button>
+                        <Button type="button" onClick={() => validateStep(3)}>
+                          Suivant
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </>
             {step === 3 && (
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold">
