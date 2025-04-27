@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 // Interfaces
 interface Event {
@@ -30,6 +30,7 @@ interface Joueur {
 }
 
 export async function getJoueursByUser(userClerkId: string): Promise<Joueur[]> {
+  const prisma = getPrismaClient();
   try {
     const joueurs = await prisma.joueur.findMany({
       where: {

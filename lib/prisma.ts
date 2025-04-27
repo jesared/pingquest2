@@ -1,10 +1,28 @@
-// lib/prisma.ts
 import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+// Ajout d'un type pour global
+declare global {
+  let prisma: PrismaClient | undefined;
+}
 
-const prisma = globalForPrisma.prisma || new PrismaClient();
+// Utiliser globalThis pour une meilleure compatibilité
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
-export default prisma;
+/**
+ * Crée une nouvelle instance de PrismaClient ou réutilise l'instance existante en développement
+ */
+export function getPrismaClient(): PrismaClient {
+  // En production (comme sur Vercel), créer une nouvelle instance à chaque appel
+  if (process.env.NODE_ENV === "production") {
+    return new PrismaClient();
+  }
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  // En développement, réutiliser l'instance singleton pour éviter "too many connections"
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = new PrismaClient();
+  }
+
+  return globalForPrisma.prisma;
+}

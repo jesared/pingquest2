@@ -1,7 +1,8 @@
-import prisma from "@/lib/prisma"; // 👈 Ton fichier pour connecter à la base de données (ex: avec Prisma, mysql2, etc.)
+import { getPrismaClient } from "@/lib/prisma"; // 👈 Ton fichier pour connecter à la base de données (ex: avec Prisma, mysql2, etc.)
 import { NextResponse } from "next/server";
 
 export async function GET() {
+  const prisma = getPrismaClient();
   try {
     const epreuves = await prisma.event.findMany({
       select: {

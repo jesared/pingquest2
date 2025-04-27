@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { parseStringPromise } from "xml2js";
 
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   if (!licence) {
     return NextResponse.json({ error: "Licence manquante" }, { status: 400 });
   }
-
+  const prisma = getPrismaClient();
   try {
     // 🔥 Vérification BDD d'abord
     const joueurExistant = await prisma.joueur.findUnique({
