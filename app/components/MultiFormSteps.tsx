@@ -90,7 +90,7 @@ export default function MultiStepForm() {
     handleSubmit,
     trigger,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     watch,
   } = useForm<FormData>({
     mode: "onChange",
@@ -437,7 +437,16 @@ export default function MultiStepForm() {
                   <Button type="button" onClick={() => setStep(2)}>
                     Précédent
                   </Button>
-                  <Button type="submit">Confirmer l&rsquo;inscription</Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Validation...</span>
+                      </div>
+                    ) : (
+                      "Confirmer l’inscription"
+                    )}
+                  </Button>
                 </div>
               </div>
             )}
