@@ -26,7 +26,7 @@ interface Joueur {
   nom: string;
   prenom: string;
   club: string | null;
-  Engagement: Engagement[];
+  engagement: Engagement[];
 }
 
 export async function getJoueursByUser(userClerkId: string): Promise<Joueur[]> {
@@ -37,7 +37,7 @@ export async function getJoueursByUser(userClerkId: string): Promise<Joueur[]> {
         userClerkId: userClerkId,
       },
       include: {
-        Engagement: {
+        engagement: {
           include: {
             event: true,
           },

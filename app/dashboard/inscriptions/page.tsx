@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
+import { DeleteJoueurButton } from "@/app/components/DeletedJoueurButton";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -11,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getJoueursByUser } from "@/lib/data";
+import { Trash } from "lucide-react";
 
 // Importez depuis lib/data
 
@@ -33,6 +35,9 @@ export default async function Page() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="text-gray-500 ">
+                  <Trash className="h-4 w-4 text-center" />
+                </TableHead>
                 <TableHead className="text-gray-500 text-center">
                   Dossard
                 </TableHead>
@@ -55,6 +60,9 @@ export default async function Page() {
               {joueurs.map((joueur) => (
                 <TableRow key={joueur.id}>
                   <TableCell>
+                    <DeleteJoueurButton joueurId={joueur.id} />
+                  </TableCell>
+                  <TableCell>
                     <Badge variant="outline">{joueur.dossard}</Badge>
                   </TableCell>
                   <TableCell>{joueur.numeroLicence}</TableCell>
@@ -67,7 +75,7 @@ export default async function Page() {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-2">
-                      {joueur.Engagement.map((engagement) => (
+                      {joueur.engagement.map((engagement) => (
                         <span
                           key={engagement.id}
                           className="bg-primary-foreground text-primary p-1 rounded-full text-sm"

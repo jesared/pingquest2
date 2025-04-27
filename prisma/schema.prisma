@@ -39,7 +39,7 @@ model Joueur {
   userClerkId    String  // Ajout du champ userClerkId pour stocker l'ID de l'utilisateur Clerk
   createdAt      DateTime @default(now())
 
-  Engagement Engagement[]
+  engagement Engagement[]
 
   User User[]
 }
@@ -65,7 +65,7 @@ model Event {
 model Engagement {
   id             Int      @id @default(autoincrement())
   joueurId       Int
-  joueur         Joueur   @relation(fields: [joueurId], references: [id])
+  joueur         Joueur   @relation(fields: [joueurId], references: [id], onDelete: Cascade)
   eventId        Int
   event          Event    @relation(fields: [eventId], references: [id])
   dateEngagement DateTime @default(now()) // Date de l'engagement
