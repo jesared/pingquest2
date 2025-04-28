@@ -1,8 +1,9 @@
-import { getPrismaClient } from "@/lib/prisma"; // 👈 Ton fichier pour connecter à la base de données (ex: avec Prisma, mysql2, etc.)
+import { getPrismaClient } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   const prisma = getPrismaClient();
+
   try {
     const epreuves = await prisma.event.findMany({
       select: {
@@ -21,9 +22,17 @@ export async function GET() {
       orderBy: [{ date: "asc" }, { minPoints: "asc" }],
     });
 
-    return NextResponse.json(epreuves);
+    return NextResponse.json(epreuves, {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+      },
+    });
   } catch (error) {
     console.error("Erreur API /api/epreuves:", error);
-    return new NextResponse("Erreur serveur", { status: 500 });
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

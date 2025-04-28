@@ -54,6 +54,7 @@ export default function Page() {
   return (
     <div className="w-full p-4 border border-gray-200 bg-gray-50 rounded-t-xl dark:border-gray-600 dark:bg-gray-700">
       <div className="mx-auto text-center ml-4">
+        {/*un chargement avant les données players.map((joueur) */}
         <h1 className="text-2xl font-bold">Inscriptions</h1>
         <p className="text-gray-500">Liste des inscrits</p>
         <div className="mt-4">
