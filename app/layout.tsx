@@ -20,12 +20,16 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          <SidebarProvider className="flex h-screen ">
+          <SidebarProvider>
             <AppSidebar />
             <Toaster richColors position="top-center" />
             <main>
               <SidebarTrigger />
-              {children}
+              <div className="flex w-full">
+                <div className="flex-auto max-w-4xl min-w-0 pt-6 lg:px-8 lg:pt-8 pb:12 xl:pb-24 lg:pb-16">
+                  {children}
+                </div>
+              </div>
             </main>
           </SidebarProvider>
         </body>

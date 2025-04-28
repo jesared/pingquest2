@@ -173,7 +173,7 @@ export default function MultiStepForm() {
 
     if (step === 2) {
       const selectedEpreuves = watch("epreuves");
-      console.log("selectedEpreuves:", selectedEpreuves);
+
       if (!selectedEpreuves || selectedEpreuves.length === 0) {
         toast.error(
           "Veuillez sélectionner au moins un tableau pour continuer."
@@ -195,7 +195,15 @@ export default function MultiStepForm() {
       {!successMessage && (
         <>
           <ProgressBar currentStep={step} steps={steps} />
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+              }
+            }}
+            className="space-y-8"
+          >
             {step === 1 && (
               <div className="space-y-4">
                 <Input
@@ -238,7 +246,7 @@ export default function MultiStepForm() {
                 )}
                 {/* Montre les autres champs uniquement si le nom a été récupéré */}
                 {watch("nom") && (
-                  <>
+                  <div className="grid grid-cols-2 gap-4">
                     <Input {...register("nom")} placeholder="Nom" readOnly />
                     {errors.nom && (
                       <p className="text-red-500 text-xs">
@@ -256,18 +264,7 @@ export default function MultiStepForm() {
                         {errors.prenom.message}
                       </p>
                     )}
-
-                    <Input
-                      {...register("pointsOfficiel")}
-                      placeholder="Points Officiel"
-                      readOnly
-                    />
-                    {errors.pointsOfficiel && (
-                      <p className="text-red-500 text-xs">
-                        {errors.pointsOfficiel.message}
-                      </p>
-                    )}
-                  </>
+                  </div>
                 )}
                 {/* Montre le bouton uniquement si le nom a été récupéré */}
                 {watch("pointsOfficiel") && (
@@ -309,16 +306,18 @@ export default function MultiStepForm() {
                               .map((e) => (
                                 <label
                                   key={e.id}
-                                  className="flex items-center gap-2"
+                                  className="flex items-center space-x-2 cursor-pointer"
                                 >
                                   <Input
                                     type="checkbox"
                                     value={e.id}
                                     {...register("epreuves")}
-                                    className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
+                                    className="hidden peer"
                                   />
-
-                                  <span className="ml-1">
+                                  <span
+                                    className="ml-2 px-2 py-1 rounded-md border transition
+    peer-checked:border-accent peer-checked:bg-accent/10"
+                                  >
                                     {e.tableau} ({e.categorie})
                                   </span>
                                 </label>
@@ -336,15 +335,18 @@ export default function MultiStepForm() {
                               .map((e) => (
                                 <label
                                   key={e.id}
-                                  className="flex items-center gap-2"
+                                  className="flex items-center space-x-2 cursor-pointer"
                                 >
                                   <Input
                                     type="checkbox"
                                     value={e.id}
                                     {...register("epreuves")}
-                                    className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
+                                    className="hidden peer"
                                   />
-                                  <span className="ml-2">
+                                  <span
+                                    className="ml-2 px-2 py-1 rounded-md border transition
+    peer-checked:border-accent peer-checked:bg-accent/10"
+                                  >
                                     {e.tableau} ({e.categorie})
                                   </span>
                                 </label>
@@ -361,15 +363,18 @@ export default function MultiStepForm() {
                               .map((e) => (
                                 <label
                                   key={e.id}
-                                  className="flex items-center gap-2 "
+                                  className="flex items-center space-x-2 cursor-pointer"
                                 >
                                   <Input
                                     type="checkbox"
                                     value={e.id}
                                     {...register("epreuves")}
-                                    className="p-0 m-0 h-6 w-6 rounded-full border-2 border-accent bg-white checked:bg-accent appearance-none focus:ring-1 focus:ring-accent transition"
+                                    className="hidden peer"
                                   />
-                                  <span className="ml-2">
+                                  <span
+                                    className="ml-2 px-2 py-1 rounded-md border transition
+    peer-checked:border-accent peer-checked:bg-accent/10"
+                                  >
                                     {e.tableau} ({e.categorie})
                                   </span>
                                 </label>
@@ -377,11 +382,19 @@ export default function MultiStepForm() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-4">
-                        <Button type="button" onClick={() => setStep(1)}>
+                      <div className="grid grid-cols-2 gap-4">
+                        <Button
+                          className="w-full"
+                          type="button"
+                          onClick={() => setStep(1)}
+                        >
                           Précédent
                         </Button>
-                        <Button type="button" onClick={() => validateStep(3)}>
+                        <Button
+                          className="w-full"
+                          type="button"
+                          onClick={() => validateStep(3)}
+                        >
                           Suivant
                         </Button>
                       </div>
@@ -397,21 +410,34 @@ export default function MultiStepForm() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">
-                      Identité du joueur :
-                    </h3>
-                    <div className="text-sm text-gray-600 space-y-1">
-                      <p>Numéro de Licence: {watch("numeroLicence")}</p>
-                      <p>Nom: {watch("nom")}</p>
-                      <p>Prénom: {watch("prenom")}</p>
-                      <p>Club: {watch("club")}</p>
-                      <p>Points Officiel: {watch("pointsOfficiel")}</p>
+                    <h3 className="text-lg font-medium">Identité du joueur</h3>
+                    <div className="text-sm text-gray-600 space-y-1 text-left">
+                      <p>
+                        <span className="text-gray-400">
+                          Numéro de Licence:{" "}
+                        </span>{" "}
+                        {watch("numeroLicence")}
+                      </p>
+                      <p>
+                        <span className="text-gray-400">Nom: </span>
+                        {watch("nom")}
+                      </p>
+                      <p>
+                        <span className="text-gray-400">Prénom: </span>
+                        {watch("prenom")}
+                      </p>
+                      <p>
+                        <span className="text-gray-400">Club: </span>
+                        {watch("club")}
+                      </p>
+                      <p>
+                        <span className="text-gray-400">Points Officiel: </span>
+                        {watch("pointsOfficiel")}
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">
-                      Tableaux choisis :
-                    </h3>
+                    <h3 className="text-lg font-medium">Tableaux choisis</h3>
                     <div className="flex flex-wrap gap-2">
                       {Array.isArray(watch("epreuves")) &&
                         (watch("epreuves") || []).map((epreuveId) => {
@@ -423,7 +449,7 @@ export default function MultiStepForm() {
                           return (
                             <Badge
                               key={epreuve.id}
-                              className=" px-3 py-1 rounded-2 bg-accent text-sm"
+                              className=" px-3 py-1 rounded-2 border-accent bg-accent/10 text-sm text-accent-foreground"
                             >
                               {epreuve.tableau} ({epreuve.categorie})
                             </Badge>
@@ -433,11 +459,19 @@ export default function MultiStepForm() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Button type="button" onClick={() => setStep(2)}>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    className="w-full"
+                    type="button"
+                    onClick={() => setStep(2)}
+                  >
                     Précédent
                   </Button>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? (
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-5 w-5 animate-spin" />

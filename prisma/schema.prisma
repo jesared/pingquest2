@@ -41,7 +41,7 @@ model Joueur {
 
   engagement Engagement[]
 
-  User User[]
+  user User @relation(fields: [userClerkId], references: [id])
 }
 
 

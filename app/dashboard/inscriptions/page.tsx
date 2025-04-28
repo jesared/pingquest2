@@ -47,11 +47,12 @@ export default function Page() {
 
   // Fonction qui met à jour le tableau en supprimant le joueur localement
   const handleDelete = (id: number) => {
+    console.log(id);
     setPlayers((prev) => prev.filter((player) => player.id !== id));
   };
 
   return (
-    <div className="flex items-center justify-center flex-col">
+    <div className="w-full p-4 border border-gray-200 bg-gray-50 rounded-t-xl dark:border-gray-600 dark:bg-gray-700">
       <div className="mx-auto text-center ml-4">
         <h1 className="text-2xl font-bold">Inscriptions</h1>
         <p className="text-gray-500">Liste des inscrits</p>
