@@ -22,10 +22,7 @@ export async function POST(request: Request) {
   const prisma = getPrismaClient();
 
   if (!userId) {
-    return NextResponse.json(
-      { error: "Utilisateur non authentifié." },
-      { status: 401 }
-    );
+    return NextResponse.json({ joueurs: [] }, { status: 200 });
   }
 
   try {
@@ -158,12 +155,10 @@ export async function POST(request: Request) {
 export async function GET() {
   const { userId } = await auth(); // Authentification Clerk
   const prisma = getPrismaClient();
-
+  console.log(userId);
   if (!userId) {
-    return NextResponse.json(
-      { error: "Utilisateur non authentifié." },
-      { status: 401 }
-    );
+    // 🔥 NOUVEAU : Retourner un tableau vide si pas d'utilisateur connecté
+    return NextResponse.json({ joueurs: [] }, { status: 200 });
   }
 
   try {

@@ -5,6 +5,7 @@ interface Joueur {
   nom: string;
   prenom: string;
   club: string;
+  pointsOfficiel: number;
   engagement: {
     id: string;
     event: {

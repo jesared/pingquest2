@@ -15,6 +15,7 @@ interface Joueur {
   nom: string;
   prenom: string;
   club: string;
+  pointsOfficiel: number;
   engagement: {
     id: string;
     event: {
@@ -30,29 +31,32 @@ interface CardJoueurProps {
 
 export default function CardJoueur({ joueur }: CardJoueurProps) {
   return (
-    <Card className="w-[350px] hover:shadow-lg transition-shadow">
-      <CardHeader>
+    <Card className="w-[280px] hover:bg-muted transition-all duration-300 hover:shadow-xl hover:scale-[1.002]">
+      <CardHeader className="p-3">
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle>
+            <CardTitle className="text-base">
               {joueur.prenom} {joueur.nom}
             </CardTitle>
-            <CardDescription>{joueur.club}</CardDescription>
+            <CardDescription className="text-xs mt-1">
+              {joueur.club}
+            </CardDescription>
           </div>
           <Badge variant="outline" className="ml-2">
-            #{joueur.dossard}
+            #{joueur.pointsOfficiel}
           </Badge>
         </div>
       </CardHeader>
       <CardContent>
         {joueur.engagement.length > 0 ? (
           <div className="space-y-2">
-            <h4 className="text-xs text-gray-400 text-left font-medium">
-              Engagements :
-            </h4>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1">
               {joueur.engagement.map((eng) => (
-                <Badge key={eng.id} variant="secondary">
+                <Badge
+                  key={eng.id}
+                  variant="outline"
+                  className="text-xs px-2 py-1 rounded-full"
+                >
                   {eng.event.tableau}
                 </Badge>
               ))}
@@ -62,8 +66,8 @@ export default function CardJoueur({ joueur }: CardJoueurProps) {
           <p className="text-sm text-muted-foreground">Aucun engagement</p>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between text-sm">
-        <span>Licence: {joueur.numeroLicence}</span>
+      <CardFooter className="flex justify-end text-xs text-muted-foreground">
+        <code>{joueur.numeroLicence}</code>
       </CardFooter>
     </Card>
   );

@@ -13,6 +13,7 @@ export async function GET() {
         nom: true,
         prenom: true,
         club: true,
+        pointsOfficiel: true,
         engagement: {
           select: {
             id: true,
@@ -29,7 +30,6 @@ export async function GET() {
         nom: "asc", // Tri alphabétique par nom
       },
     });
-
     if (!joueurs.length) {
       return NextResponse.json(
         { message: "Aucun joueur trouvé" },
@@ -39,6 +39,7 @@ export async function GET() {
 
     return NextResponse.json(joueurs, {
       status: 200,
+
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-store, max-age=0",
