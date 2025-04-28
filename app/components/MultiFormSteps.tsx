@@ -49,7 +49,9 @@ export default function MultiStepForm() {
     setLoadingFftt(true);
 
     try {
-      const response = await fetch(`/api/fftt?licence=${licence}`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL}/api/fftt?licence=${licence}`
+      );
 
       const data = await response.json();
 

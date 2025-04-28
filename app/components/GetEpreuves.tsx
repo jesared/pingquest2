@@ -13,15 +13,12 @@ import Link from "next/link";
 
 // Fonction pour récupérer les épreuves depuis ton API
 async function fetchEpreuves() {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (typeof window !== "undefined"
-      ? window.location.origin
-      : "http://localhost:3000");
-  console.log(baseUrl);
-  const response = await fetch(`${baseUrl}/api/epreuves`, {
-    next: { revalidate: 60 }, // Cache pendant 60 secondes
-  });
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SITE_URL}/api/epreuves`,
+    {
+      next: { revalidate: 60 }, // Cache pendant 60 secondes
+    }
+  );
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération des épreuves");
   }

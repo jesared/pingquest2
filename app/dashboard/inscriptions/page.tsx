@@ -1,6 +1,5 @@
 "use client";
 
-import { DeleteJoueurButton } from "@/app/components/DeletedJoueurButton";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -37,7 +36,9 @@ export default function Page() {
   useEffect(() => {
     async function fetchPlayers() {
       if (user) {
-        const res = await fetch(`/api/joueurs?userClerkId=${user.id}`);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/joueurs?userClerkId=${user.id}`
+        );
         const data = await res.json();
         setPlayers(data.joueurs || []);
       }
@@ -46,10 +47,9 @@ export default function Page() {
   }, [user]);
 
   // Fonction qui met à jour le tableau en supprimant le joueur localement
-  const handleDelete = (id: number) => {
-    console.log(id);
-    setPlayers((prev) => prev.filter((player) => player.id !== id));
-  };
+  // const handleDelete = (id: number) => {
+  //   setPlayers((prev) => prev.filter((player) => player.id !== id));
+  // };
 
   return (
     <div className="w-full p-4 border border-gray-200 bg-gray-50 rounded-t-xl dark:border-gray-600 dark:bg-gray-700">
@@ -86,10 +86,10 @@ export default function Page() {
               {players.map((joueur) => (
                 <TableRow key={joueur.id}>
                   <TableCell>
-                    <DeleteJoueurButton
+                    {/* <DeleteJoueurButton
                       joueurId={joueur.id}
                       onDelete={handleDelete}
-                    />
+                    /> */}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{joueur.dossard}</Badge>
