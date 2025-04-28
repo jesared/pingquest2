@@ -14,7 +14,7 @@ import Link from "next/link";
 // Fonction pour récupérer les épreuves depuis ton API
 async function fetchEpreuves() {
   const baseUrl =
-    process.env.VERCEL_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
     (typeof window !== "undefined"
       ? window.location.origin
       : "http://localhost:3000");
