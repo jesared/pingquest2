@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   Star,
   Trophy,
-  User,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -21,8 +20,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { SignInButton, SignOutButton, useAuth, useUser } from "@clerk/nextjs"; // Clerk imports
-import Image from "next/image";
+import { SignInButton, useAuth, UserButton } from "@clerk/nextjs"; // Clerk imports
 import { usePathname } from "next/navigation"; // Pour obtenir l'URL actuelle
 // Menu items.
 const items = [
@@ -59,8 +57,7 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { isSignedIn } = useAuth(); // Hook Clerk pour vérifier l'état de connexion
-  const { user } = useUser(); // Récupérer les infos de l'utilisateur
+  const { isSignedIn } = useAuth(); // Hook Clerk pour vérifier l'état de connexion// Récupérer les infos de l'utilisateur
   const pathname = usePathname(); // Récupérer l'URL actuelle
 
   return (
@@ -107,29 +104,14 @@ export function AppSidebar() {
                   className="p-0 m-0 h-auto min-h-0 flex items-center"
                 >
                   {isSignedIn ? (
-                    <SignOutButton>
-                      <button
-                        className="flex items-center w-full h-10"
-                        title="Deconnexion"
-                      >
-                        {user?.imageUrl ? (
-                          <Image
-                            src={user.imageUrl}
-                            alt="Profile"
-                            width={40}
-                            height={40}
-                            className="rounded-full object-cover overflow-hidden w-10 h-10"
-                          />
-                        ) : (
-                          <User className="w-10 h-10" />
-                        )}
-                        {user?.firstName && (
-                          <span className="ml-2 truncate text-sm leading-none">
-                            {user.firstName}
-                          </span>
-                        )}
-                      </button>
-                    </SignOutButton>
+                    <UserButton
+                      appearance={{
+                        elements: {
+                          formButtonPrimary:
+                            "bg-slate-500 hover:bg-slate-400 text-sm",
+                        },
+                      }}
+                    />
                   ) : (
                     <SignInButton mode="modal">
                       <button

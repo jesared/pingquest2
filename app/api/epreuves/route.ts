@@ -15,6 +15,8 @@ export async function GET() {
         categorie: true,
         minPoints: true,
         maxPoints: true,
+        prixAnticipe: true,
+        prixSurPlace: true,
       },
       orderBy: [{ date: "asc" }, { minPoints: "asc" }],
     });
