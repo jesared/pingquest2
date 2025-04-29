@@ -19,7 +19,7 @@ export default async function UserInfoPage() {
   }
 
   return (
-    <div className="w-full p-6 bg-gray-100 dark:bg-gray-800 rounded-md shadow-md">
+    <div className="w-full p-6">
       <div className="text-center space-y-4">
         <div className="relative mx-auto rounded-full border border-gray-300 dark:border-gray-600 p-1 w-fit shadow">
           <UploadAvatar />
