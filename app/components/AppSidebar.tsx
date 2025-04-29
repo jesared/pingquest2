@@ -124,7 +124,10 @@ export function AppSidebar() {
                   <DropdownMenuContent className="w-full">
                     {itemsTournoi.map((itemsTournoi) => {
                       return (
-                        <DropdownMenuItem key={itemsTournoi.title}>
+                        <DropdownMenuItem
+                          key={itemsTournoi.title}
+                          className="text-md"
+                        >
                           <Link
                             href={itemsTournoi.url}
                             title={itemsTournoi.title}

@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { PopoverCard } from "./PoppoverCard";
 
 interface Joueur {
   id: number;
@@ -22,12 +23,26 @@ interface Joueur {
 
 interface CardJoueurProps {
   joueur: Joueur;
+  onDeleteJoueur?: (id: number) => void;
 }
 
-export default function CardPlayer({ joueur }: CardJoueurProps) {
+export default function CardPlayer({
+  joueur,
+  onDeleteJoueur,
+}: CardJoueurProps) {
+  const handleSupprimerJoueur = (id: number) => {
+    if (onDeleteJoueur) {
+      onDeleteJoueur(id);
+    } else {
+      console.warn(
+        "Fonction onDeleteJoueur non passée au composant CardPlayer"
+      );
+    }
+  };
   return (
     <Card className="w-full max-w-xs hover:bg-muted transition-all duration-300 hover:shadow-xl hover:scale-[1.002] rounded-xl py-2">
-      <CardContent className="flex flex-col items-center gap-2 p-4">
+      <CardContent className="flex flex-col items-center gap-2 p-4 relative">
+        <PopoverCard joueur={joueur} onDelete={handleSupprimerJoueur} />
         {/* Avatar */}
         <Avatar className="w-16 h-16">
           <AvatarImage
