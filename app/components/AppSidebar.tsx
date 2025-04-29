@@ -1,17 +1,24 @@
 "use client";
 import {
+  ChevronDown,
   Home,
   LogIn,
   LogOut,
   ShieldCheck,
   Star,
   Trophy,
-  UserCircle,
   UserPlus,
   Users,
+  View,
 } from "lucide-react";
 
 import { Avatar } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +33,7 @@ import { SignInButton, SignOutButton, useAuth, useUser } from "@clerk/nextjs"; /
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Pour obtenir l'URL actuelle
+
 // Menu items.
 const items = [
   {
@@ -34,15 +42,22 @@ const items = [
     icon: Home,
   },
   {
+    title: "Vos inscriptions",
+    url: "/dashboard/inscriptions",
+    icon: Users,
+    authOnly: true,
+  },
+];
+const itemsTournoi = [
+  {
+    title: "Détails",
+    url: "/tournois/details",
+    icon: View,
+  },
+  {
     title: "Ajout",
     url: "/dashboard/ajout",
     icon: UserPlus,
-    authOnly: true,
-  },
-  {
-    title: "Inscriptions",
-    url: "/dashboard/inscriptions",
-    icon: Users,
     authOnly: true,
   },
   {
@@ -54,12 +69,6 @@ const items = [
     title: "Les participants",
     url: "/participants",
     icon: ShieldCheck,
-  },
-  {
-    title: "Profile",
-    url: "/dashboard/profile",
-    icon: UserCircle,
-    authOnly: true,
   },
 ];
 
@@ -103,12 +112,42 @@ export function AppSidebar() {
                   })}
               </SidebarMenu>
             </SidebarGroupContent>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton>
+                      Pâques ChâlonsTT
+                      <ChevronDown className="ml-auto" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-full">
+                    {itemsTournoi.map((itemsTournoi) => {
+                      return (
+                        <DropdownMenuItem key={itemsTournoi.title}>
+                          <Link
+                            href={itemsTournoi.url}
+                            title={itemsTournoi.title}
+                          >
+                            <div className="justify-center flex">
+                              <itemsTournoi.icon className="mr-2" />
+                              <span>{itemsTournoi.title}</span>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenu>
+            </SidebarGroupContent>
           </SidebarGroup>
           <SidebarSeparator className="p-0 m-0" />
-
           <div className="mt-auto p-2">
-            <SidebarSeparator className="p-0 m-0" />
-            <div className="items-center flex mb-2">
+            <Link
+              className="items-center flex mb-2 hover:bg-accent p-2 rounded-md"
+              href={"/dashboard/profile"}
+            >
               {user?.imageUrl && (
                 <Avatar>
                   <Image
@@ -121,18 +160,16 @@ export function AppSidebar() {
               )}
               <div className="justify-between space-x-1">
                 {user?.fullName && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate ml-2">
-                    {user.fullName}
-                  </p>
+                  <p className="text-sm  truncate ml-2">{user.fullName}</p>
                 )}
                 {user?.emailAddresses && user.emailAddresses.length > 0 && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate ml-2">
+                  <p className="text-sm text-gray-500 hover:text-primary truncate ml-2">
                     {user.emailAddresses[0].emailAddress}
                   </p>
                 )}
               </div>
-            </div>
-
+            </Link>
+            <SidebarSeparator className="p-0 mx-0 my-3" />
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
