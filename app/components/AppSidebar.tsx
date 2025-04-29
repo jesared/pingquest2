@@ -3,10 +3,10 @@
 import {
   Home,
   LogIn,
-  Settings,
   ShieldCheck,
   Star,
   Trophy,
+  UserCircle,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -52,16 +52,16 @@ const items = [
     icon: ShieldCheck,
   },
   {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "Profile",
+    url: "/dashboard/profile",
+    icon: UserCircle,
     authOnly: true,
   },
 ];
 
 export function AppSidebar() {
   const { isSignedIn } = useAuth(); // Hook Clerk pour vérifier l'état de connexion// Récupérer les infos de l'utilisateur
-  const pathname = usePathname(); // Récupérer l'URL actuelle
+  const pathname = usePathname();
 
   return (
     <>
@@ -112,6 +112,7 @@ export function AppSidebar() {
                     <UserButton
                       appearance={{
                         elements: {
+                          userButtonAvatarBox: "w-16 h-16", // Ajuster la taille de l'avatar
                           formButtonPrimary:
                             "bg-slate-500 hover:bg-slate-400 text-sm",
                         },

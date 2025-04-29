@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AvatarProvider } from "@/lib/AvartarContext";
 import { AppSidebar } from "./components/AppSidebar";
 import "./globals.css";
 
@@ -20,18 +21,20 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          <SidebarProvider>
-            <AppSidebar />
-            <Toaster richColors position="top-center" />
-            <main>
-              <SidebarTrigger />
-              <div className="flex w-full">
-                <div className="flex-auto max-w-4xl min-w-0 pt-6 lg:px-8 lg:pt-8 pb:12 xl:pb-24 lg:pb-16">
-                  {children}
+          <AvatarProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <Toaster richColors position="top-center" />
+              <main>
+                <SidebarTrigger />
+                <div className="flex w-full">
+                  <div className="flex-auto max-w-4xl min-w-0 pt-6 lg:px-8 lg:pt-8 pb:12 xl:pb-24 lg:pb-16">
+                    {children}
+                  </div>
                 </div>
-              </div>
-            </main>
-          </SidebarProvider>
+              </main>
+            </SidebarProvider>
+          </AvatarProvider>
         </body>
       </html>
     </ClerkProvider>
