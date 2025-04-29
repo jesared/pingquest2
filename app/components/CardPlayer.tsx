@@ -45,7 +45,7 @@ export default function CardPlayer({ joueur }: CardJoueurProps) {
           <p className="text-sm font-semibold">
             {joueur.prenom} {joueur.nom}
           </p>
-          <p className="text-xs text-gray-400">{joueur.club}</p>
+          <p className="text-[10px] text-gray-400">{joueur.club}</p>
         </div>
         {joueur.engagement.length > 0 ? (
           <div className="space-y-2">
@@ -65,8 +65,8 @@ export default function CardPlayer({ joueur }: CardJoueurProps) {
           <p className="text-sm text-muted-foreground">Aucun engagement</p>
         )}
         {/* Points + Licence alignés à droite */}
-        <div className="w-full flex justify-end mt-2 text-right">
-          <div className="flex flex-col items-end text-xs text-gray-500">
+        <div className="w-full flex justify-end text-right">
+          <div className="flex flex-col items-end text-xs text-gray-500 gap-1">
             <Badge
               variant={"outline"}
               className="text-primary font-bold text-sm"

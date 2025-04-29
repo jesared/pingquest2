@@ -33,11 +33,13 @@ const items = [
     title: "Ajout",
     url: "/dashboard/ajout",
     icon: UserPlus,
+    authOnly: true,
   },
   {
     title: "Inscriptions",
     url: "/dashboard/inscriptions",
     icon: Users,
+    authOnly: true,
   },
   {
     title: "Les épreuves",
@@ -53,6 +55,7 @@ const items = [
     title: "Settings",
     url: "#",
     icon: Settings,
+    authOnly: true,
   },
 ];
 
@@ -76,22 +79,24 @@ export function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {items.map((item) => {
-                  const isActive = pathname === item.url; // Vérifier si le lien est actif
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        className={isActive ? "bg-primary text-white" : ""} // Couleur pour le lien actif
-                      >
-                        <a href={item.url} title={item.title}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </a>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
+                {items
+                  .filter((item) => !item.authOnly || isSignedIn)
+                  .map((item) => {
+                    const isActive = pathname === item.url; // Vérifier si le lien est actif
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild
+                          className={isActive ? "bg-primary text-white" : ""} // Couleur pour le lien actif
+                        >
+                          <a href={item.url} title={item.title}>
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </a>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

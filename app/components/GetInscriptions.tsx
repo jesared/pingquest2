@@ -30,14 +30,16 @@ interface ApiResponse {
 function GetInscriptions() {
   const [players, setPlayers] = useState<Joueur[]>([]);
   const { user } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchPlayers() {
       if (user) {
+        setIsLoading(true);
         try {
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SITE_URL}/api/joueurs?userClerkId=${user.id}`
-          );
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/joueurs`
+          ); // Appel direct sans paramètre
           if (!res.ok) {
             console.error(
               `Erreur lors de la récupération des joueurs: ${res.status}`
@@ -48,6 +50,8 @@ function GetInscriptions() {
           setPlayers(data.joueurs || []);
         } catch (error) {
           console.error("Erreur lors de la requête:", error);
+        } finally {
+          setIsLoading(false); // Fin du chargement dans tous les cas
         }
       }
     }
@@ -58,9 +62,18 @@ function GetInscriptions() {
   // Dans GetInscriptions.tsx
   return (
     <>
-      {players.map((joueur) => (
-        <CardPlayer key={joueur.id} joueur={joueur} />
-      ))}
+      {isLoading ? (
+        <div className="mt-6 flex justify-center items-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary" />
+          <span className="ml-4 text-sm text-muted-foreground">
+            Chargement...
+          </span>
+        </div>
+      ) : players && players.length > 0 ? (
+        players.map((joueur) => <CardPlayer key={joueur.id} joueur={joueur} />)
+      ) : (
+        <p className="text-sm text-muted-foreground">Aucune inscription</p>
+      )}
     </>
   );
 }

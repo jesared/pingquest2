@@ -152,41 +152,32 @@ export async function POST(request: Request) {
     );
   }
 }
+
 export async function GET() {
-  const { userId } = await auth(); // Authentification Clerk
+  const { userId } = await auth(); // Récupère l'ID Clerk
   const prisma = getPrismaClient();
-  console.log(userId);
+
   if (!userId) {
-    // 🔥 NOUVEAU : Retourner un tableau vide si pas d'utilisateur connecté
     return NextResponse.json({ joueurs: [] }, { status: 200 });
   }
 
   try {
-    // Récupérer tous les joueurs qui sont liés à l'utilisateur Clerk
     const joueurs = await prisma.joueur.findMany({
       where: {
-        userClerkId: userId, // Filtrer les joueurs par l'ID Clerk de l'utilisateur authentifié
+        userClerkId: userId, // 🔥 Liaison entre joueur et utilisateur connecté
       },
       include: {
         engagement: {
           include: {
-            event: true, // Inclure les événements associés aux engagements
+            event: true,
           },
         },
       },
     });
 
-    // Si aucun joueur n'est trouvé
-    if (joueurs.length === 0) {
-      return NextResponse.json(
-        { message: "Aucun joueur trouvé pour cet utilisateur." },
-        { status: 404 }
-      );
-    }
-
     return NextResponse.json({ joueurs }, { status: 200 });
   } catch (error) {
-    console.error("Erreur lors de la récupération des joueurs:", error);
+    console.error("Erreur lors de la récupération des joueurs :", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des joueurs." },
       { status: 500 }
