@@ -33,18 +33,17 @@ function GetInscriptions() {
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fonction de suppression de joueur
   const handleDeletePlayer = async (idToDelete: number) => {
     const confirm = window.confirm(
       "Es-tu sûr de vouloir supprimer ce joueur ? Cette action est irréversible."
     );
     if (!confirm) return;
+
     try {
-      const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/joueur/${idToDelete}`; // Affiche l'URL
-      console.log("URL de suppression appelée :", url);
-      const res = await fetch(url, {
-        method: "DELETE",
-      });
-      console.log("res", res);
+      const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/joueur/${idToDelete}`;
+      const res = await fetch(url, { method: "DELETE" });
+
       if (!res.ok) {
         let errorMessage = `Erreur HTTP ${res.status}`;
         const contentType = res.headers.get("content-type");
@@ -52,7 +51,6 @@ function GetInscriptions() {
           const errorData = await res.json();
           errorMessage = errorData.message || errorMessage;
         }
-
         console.error(
           "Erreur lors de la suppression du joueur :",
           errorMessage
@@ -61,8 +59,12 @@ function GetInscriptions() {
         return;
       }
 
+      // Met à jour l'état local après suppression
+      setPlayers((prevPlayers) =>
+        prevPlayers.filter((player) => player.id !== idToDelete)
+      );
+
       toast.success("Joueur supprimé avec succès !");
-      setPlayers(players.filter((player) => player.id !== idToDelete));
     } catch (error) {
       console.error("Erreur lors de la suppression du joueur:", error);
       toast.error("Erreur serveur lors de la suppression.");
@@ -76,19 +78,21 @@ function GetInscriptions() {
         try {
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_SITE_URL}/api/joueurs`
-          ); // Appel direct sans paramètre
+          );
           if (!res.ok) {
             console.error(
               `Erreur lors de la récupération des joueurs: ${res.status}`
             );
+            toast.error("Erreur lors de la récupération des joueurs.");
             return;
           }
           const data: ApiResponse = await res.json();
           setPlayers(data.joueurs || []);
         } catch (error) {
           console.error("Erreur lors de la requête:", error);
+          toast.error("Erreur lors de la récupération des joueurs.");
         } finally {
-          setIsLoading(false); // Fin du chargement dans tous les cas
+          setIsLoading(false); // Fin du chargement
         }
       }
     }
@@ -96,7 +100,6 @@ function GetInscriptions() {
     fetchPlayers();
   }, [user]);
 
-  // Dans GetInscriptions.tsx
   return (
     <>
       {isLoading ? (
