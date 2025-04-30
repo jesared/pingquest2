@@ -19,7 +19,7 @@ export const DELETE = async (
       );
     }
 
-    const deletedJoueur = await prisma.joueur.delete({
+    await prisma.joueur.delete({
       where: {
         id: joueurId,
       },

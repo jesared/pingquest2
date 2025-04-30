@@ -2,6 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import CardPlayer from "./CardPlayer";
 
 interface Engagement {
@@ -33,6 +34,10 @@ function GetInscriptions() {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleDeletePlayer = async (idToDelete: number) => {
+    const confirm = window.confirm(
+      "Es-tu sûr de vouloir supprimer ce joueur ? Cette action est irréversible."
+    );
+    if (!confirm) return;
     try {
       const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/joueur/${idToDelete}`; // Affiche l'URL
       console.log("URL de suppression appelée :", url);
@@ -52,17 +57,15 @@ function GetInscriptions() {
           "Erreur lors de la suppression du joueur :",
           errorMessage
         );
-        alert(errorMessage);
+        toast.error(errorMessage);
         return;
       }
 
-      console.log(`Joueur avec l'ID ${idToDelete} supprimé avec succès`);
+      toast.success("Joueur supprimé avec succès !");
       setPlayers(players.filter((player) => player.id !== idToDelete));
     } catch (error) {
       console.error("Erreur lors de la suppression du joueur:", error);
-      alert(
-        "Erreur serveur lors de la suppression du joueur. Consultez la console pour plus de détails."
-      );
+      toast.error("Erreur serveur lors de la suppression.");
     }
   };
 

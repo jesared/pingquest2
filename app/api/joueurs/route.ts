@@ -100,6 +100,7 @@ export async function POST(request: Request) {
 
         await prisma.engagement.createMany({
           data: engagementsData,
+          skipDuplicates: true,
         });
       }
 
