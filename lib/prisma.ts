@@ -16,7 +16,10 @@ const globalForPrisma = globalThis as unknown as {
 export function getPrismaClient(): PrismaClient {
   // En production (comme sur Vercel), créer une nouvelle instance à chaque appel
   if (process.env.NODE_ENV === "production") {
-    return new PrismaClient();
+    if (!globalForPrisma.prisma) {
+      globalForPrisma.prisma = new PrismaClient();
+    }
+    return globalForPrisma.prisma;
   }
 
   // En développement, réutiliser l'instance singleton pour éviter "too many connections"
