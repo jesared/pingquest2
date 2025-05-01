@@ -11,7 +11,7 @@ import Link from "next/link";
 export default function page() {
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 max-w-3xl">
         {/* Section de la photo de couverture */}
         <section className="mb-8">
           <Image

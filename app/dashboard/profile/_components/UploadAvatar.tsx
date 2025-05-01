@@ -101,7 +101,7 @@ const UploadAvatar: React.FC = () => {
   }
 
   return (
-    <div className="relative w-24 h-24">
+    <div className="relative w-48 h-48">
       {/* Afficher l'image de profil */}
       {avatarUrl ? (
         <Image
@@ -119,7 +119,7 @@ const UploadAvatar: React.FC = () => {
       {/* Bouton d'upload */}
       <label
         htmlFor="upload-image"
-        className="absolute bottom-0 right-0 bg-primary rounded-full p-1 text-white cursor-pointer shadow-md hover:bg-primary-foreground"
+        className="absolute top-4 right-2 bg-primary rounded-full p-1 text-white cursor-pointer shadow-md hover:bg-primary-foreground"
         aria-label="Modifier l'image de profil"
       >
         <svg

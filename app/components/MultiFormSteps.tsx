@@ -188,7 +188,7 @@ export default function MultiStepForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <>
       {successMessage && (
         <div className="text-green-600 text-center font-bold text-xl mb-6">
           🎉 Inscription réussie ! Redirection en cours...
@@ -318,7 +318,7 @@ export default function MultiStepForm() {
                                   />
                                   <span
                                     className="ml-2 px-2 py-1 rounded-md border transition
-    peer-checked:border-accent peer-checked:bg-accent/10"
+    peer-checked:border-accent peer-checked:bg-accent "
                                   >
                                     {e.tableau} ({e.categorie})
                                   </span>
@@ -347,7 +347,7 @@ export default function MultiStepForm() {
                                   />
                                   <span
                                     className="ml-2 px-2 py-1 rounded-md border transition
-    peer-checked:border-accent peer-checked:bg-accent/10"
+    peer-checked:border-accent peer-checked:bg-accent"
                                   >
                                     {e.tableau} ({e.categorie})
                                   </span>
@@ -375,7 +375,7 @@ export default function MultiStepForm() {
                                   />
                                   <span
                                     className="ml-2 px-2 py-1 rounded-md border transition
-    peer-checked:border-accent peer-checked:bg-accent/10"
+    peer-checked:border-accent peer-checked:bg-accent"
                                   >
                                     {e.tableau} ({e.categorie})
                                   </span>
@@ -451,7 +451,7 @@ export default function MultiStepForm() {
                           return (
                             <Badge
                               key={epreuve.id}
-                              className=" px-3 py-1 rounded-2 border-accent bg-accent/10 text-sm text-accent-foreground"
+                              className=" px-3 py-1 rounded-2 border-accent bg-accent text-sm text-accent-foreground"
                             >
                               {epreuve.tableau} ({epreuve.categorie})
                             </Badge>
@@ -489,6 +489,6 @@ export default function MultiStepForm() {
           </form>
         </>
       )}
-    </div>
+    </>
   );
 }

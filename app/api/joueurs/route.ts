@@ -13,101 +13,39 @@ const joueurSchema = yup.object({
   mobile: yup.string().optional(),
   club: yup.string().optional(),
   pointsOfficiel: yup.number().optional(),
-  userClerkId: yup.string().optional(), // L'ID Clerk peut être optionnel à la création (géré par le backend)
+  userId: yup.string().optional(), // L'ID Clerk peut être optionnel à la création (géré par le backend)
   epreuves: yup.array().of(yup.string()).optional(), // Validation des épreuves (optionnel)
 });
 
 export async function POST(request: Request) {
-  const { userId } = await auth(); // Authentification Clerk
+  const { userId: clerkUserId } = await auth(); // Renommer pour plus de clarté
   const prisma = getPrismaClient();
+  const data = await request.json();
 
-  if (!userId) {
-    return NextResponse.json({ joueurs: [] }, { status: 200 });
+  if (!clerkUserId) {
+    return NextResponse.json(
+      { error: "Utilisateur non authentifié." },
+      { status: 401 }
+    );
   }
 
   try {
-    const data = await request.json();
-
     // Validation des données avec Yup
     await joueurSchema.validate(data, { abortEarly: false });
 
-    // Vérifier si l'utilisateur existe dans la base de données
-    const userExists = await prisma.user.findUnique({
-      where: { id: userId },
+    // Rechercher l'utilisateur dans notre base de données par clerkUserId
+    const existingUser = await prisma.user.findUnique({
+      where: { clerkUserId: clerkUserId || undefined },
     });
 
-    // Si l'utilisateur n'existe pas dans la base de données
-    if (!userExists) {
-      // Récupérer les informations de l'utilisateur Clerk
-      const clerkUser = await fetch(
-        `https://api.clerk.com/v1/users/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((res) => res.json());
-
-      if (!clerkUser) {
-        return NextResponse.json(
-          { error: "Utilisateur Clerk non trouvé." },
-          { status: 400 }
-        );
-      }
-
-      // Créer un nouvel utilisateur dans la base de données
-      await prisma.user.create({
-        data: {
-          id: clerkUser.id,
-          nom: clerkUser.last_name || "Nom inconnu",
-          prenom: clerkUser.first_name || "Prénom inconnu",
-          email: clerkUser.email_addresses[0]?.email_address || "",
-          description: "", // Vous pouvez ajouter d'autres informations si disponibles
-          technologies: "",
-          job: "",
-        },
-      });
-
-      // Créer le joueur après avoir créé l'utilisateur Clerk
-      const joueur = await prisma.joueur.create({
-        data: {
-          numeroLicence: data.numeroLicence,
-          nom: data.nom,
-          prenom: data.prenom,
-          dossard: data.dossard || null,
-          email: data.email || null,
-          mobile: data.mobile || null,
-          club: data.club || null,
-          pointsOfficiel:
-            data.pointsOfficiel !== undefined
-              ? parseFloat(data.pointsOfficiel as string)
-              : null,
-          userClerkId: userId, // Lier l'utilisateur Clerk authentifié
-        },
-      });
-
-      // Création des engagements si des épreuves sont sélectionnées
-      if (
-        data.epreuves &&
-        Array.isArray(data.epreuves) &&
-        data.epreuves.length > 0
-      ) {
-        const engagementsData = data.epreuves.map((epreuveId: string) => ({
-          joueurId: joueur.id,
-          eventId: parseInt(epreuveId, 10), // Forcer en nombre
-        }));
-
-        await prisma.engagement.createMany({
-          data: engagementsData,
-          skipDuplicates: true,
-        });
-      }
-
-      return NextResponse.json({ joueur }, { status: 201 });
+    if (!existingUser) {
+      console.error(`Utilisateur non trouvé pour clerkUserId: ${clerkUserId}`);
+      return NextResponse.json(
+        { error: "L'utilisateur associé n'existe pas." },
+        { status: 400 }
+      );
     }
 
-    // Si l'utilisateur existe déjà, créer uniquement le joueur
     const joueur = await prisma.joueur.create({
       data: {
         numeroLicence: data.numeroLicence,
@@ -121,7 +59,7 @@ export async function POST(request: Request) {
           data.pointsOfficiel !== undefined
             ? parseFloat(data.pointsOfficiel as string)
             : null,
-        userClerkId: userId, // Lier l'utilisateur Clerk authentifié
+        userId: existingUser.id, // Utiliser l'ID de notre table User
       },
     });
 
@@ -138,10 +76,11 @@ export async function POST(request: Request) {
 
       await prisma.engagement.createMany({
         data: engagementsData,
+        skipDuplicates: true,
       });
     }
 
-    return NextResponse.json({ joueur }, { status: 200 });
+    return NextResponse.json({ joueur }, { status: 201 });
   } catch (error) {
     console.error(
       "Erreur lors de la vérification/création de l'utilisateur:",
@@ -155,6 +94,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
+  const { userId: clerkUserId } = await auth();
   const { userId } = await auth(); // Récupère l'ID Clerk
   const prisma = getPrismaClient();
 
@@ -163,9 +103,20 @@ export async function GET() {
   }
 
   try {
+    const existingUser = await prisma.user.findUnique({
+      where: { clerkUserId: clerkUserId || undefined },
+    });
+
+    if (!existingUser) {
+      console.error(`Utilisateur non trouvé pour clerkUserId: ${clerkUserId}`);
+      return NextResponse.json(
+        { error: "L'utilisateur associé n'existe pas." },
+        { status: 400 }
+      );
+    }
     const joueurs = await prisma.joueur.findMany({
       where: {
-        userClerkId: userId, // 🔥 Liaison entre joueur et utilisateur connecté
+        userId: existingUser.id, // Utiliser l'ID de notre table User // 🔥 Liaison entre joueur et utilisateur connecté
       },
       include: {
         engagement: {

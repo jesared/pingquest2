@@ -1,9 +1,9 @@
 "use client";
 import {
-  ChevronDown,
   Home,
   LogIn,
   LogOut,
+  Settings,
   ShieldCheck,
   Star,
   Trophy,
@@ -14,19 +14,21 @@ import {
 
 import { Avatar } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { SignInButton, SignOutButton, useAuth, useUser } from "@clerk/nextjs"; // Clerk imports
@@ -40,6 +42,12 @@ const items = [
     title: "Home",
     url: "/",
     icon: Home,
+  },
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Settings,
+    authOnly: true,
   },
   {
     title: "Vos inscriptions",
@@ -78,7 +86,7 @@ export function AppSidebar() {
   const { user } = useUser();
   return (
     <>
-      <Sidebar>
+      <Sidebar collapsible="offcanvas">
         <SidebarContent>
           <div className="p-2 flex justify-end"></div>
           <div className="flex items-center justify-center">
@@ -112,36 +120,45 @@ export function AppSidebar() {
                   })}
               </SidebarMenu>
             </SidebarGroupContent>
+            <SidebarSeparator className="p-0 m-0 mb-2" />
+            <SidebarGroupLabel>Tournois</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton>
-                      Pâques ChâlonsTT
-                      <ChevronDown className="ml-auto" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-full">
-                    {itemsTournoi.map((itemsTournoi) => {
-                      return (
-                        <DropdownMenuItem
-                          key={itemsTournoi.title}
-                          className="text-md"
-                        >
-                          <Link
-                            href={itemsTournoi.url}
-                            title={itemsTournoi.title}
-                          >
-                            <div className="justify-center flex">
-                              <itemsTournoi.icon className="mr-2" />
-                              <span>{itemsTournoi.title}</span>
-                            </div>
-                          </Link>
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Collapsible className="group/collapsible">
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton className="text-[18px]">
+                        Pâques ChâlonsTT
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {itemsTournoi.map((itemsTournoi) => {
+                          const isActive = pathname === itemsTournoi.url;
+                          return (
+                            <SidebarMenuSubItem
+                              key={itemsTournoi.title}
+                              className={
+                                isActive
+                                  ? "border-b-1 border-primary font-black"
+                                  : ""
+                              } // Couleur pour le lien actif
+                            >
+                              <Link
+                                href={itemsTournoi.url}
+                                title={itemsTournoi.title}
+                              >
+                                <div className="items-center justify-between flex">
+                                  <span>{itemsTournoi.title}</span>
+                                </div>
+                              </Link>
+                            </SidebarMenuSubItem>
+                          );
+                        })}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
