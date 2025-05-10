@@ -150,6 +150,8 @@ export default function MultiStepForm({
         const points = parseInt(watch("pointsOfficiel") || "0", 10);
 
         const res = await fetch(`/api/epreuves?tournoiId=${tournoiId}`);
+
+        console.log("res", res);
         // 👈 Ton endpoint API qui sort les épreuves
         if (!res.ok) {
           console.error(`Erreur HTTP: ${res.status}`);

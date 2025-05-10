@@ -4,12 +4,15 @@ import { getPrismaClient } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export default async function Inscription({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const tournoiId = Number(params);
+interface InscriptionProps {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function Inscription({ searchParams }: InscriptionProps) {
+  const search = searchParams ? await searchParams : {};
+  console.log("searchParams.tournoiId:", search);
+
+  const tournoiId = Number(search);
 
   const { userId } = await auth();
   const prisma = getPrismaClient();

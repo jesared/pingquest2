@@ -77,7 +77,9 @@ export default async function Page({
           </div>
           <div className="mt-6 flex justify-between">
             <div className="flex justify-start">
-              <Link href={`/tournois/${tournoi.id}/inscription`}>
+              <Link
+                href={`/tournois/${tournoi.id}/inscription?tournoiId=${tournoi.id}`}
+              >
                 <Button size={"icon"} className="cursor-pointer rounded-full">
                   <PenTool />
                 </Button>
