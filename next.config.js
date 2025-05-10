@@ -13,6 +13,16 @@ const nextConfig = {
         hostname: "img.clerk.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "tennis2table.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "tournoi.cctt.fr",
+        pathname: "**",
+      },
     ],
   },
 };

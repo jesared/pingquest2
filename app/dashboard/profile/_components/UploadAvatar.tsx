@@ -7,8 +7,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const UploadAvatar: React.FC = () => {
-  console.log("Rendu de UploadAvatar, ID:", Math.random());
-
   const { user, isLoaded } = useUser();
   const userId = user?.id;
   const { avatarUrl, setAvatarUrl } = useAvatar();
@@ -101,15 +99,18 @@ const UploadAvatar: React.FC = () => {
   }
 
   return (
-    <div className="relative w-48 h-48">
+    <div className="relative mx-auto rounded-full border border-gray-300 dark:border-gray-600 p-1 w-fit shadow">
       {/* Afficher l'image de profil */}
       {avatarUrl ? (
-        <Image
-          src={avatarUrl}
-          alt="Avatar de l'utilisateur"
-          fill
-          className="rounded-full object-cover"
-        />
+        <div className="w-[150px] h-[150px] rounded-full border-2 overflow-hidden ring-2 ring-accent">
+          <Image
+            src={avatarUrl}
+            alt="Avatar de l'utilisateur"
+            width={150}
+            height={150}
+            className="object-cover w-full h-full"
+          />
+        </div>
       ) : (
         <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
           <span className="text-gray-500">Aucun avatar</span>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ interface Engagement {
 
 interface Joueur {
   id: number;
+  userId: string;
   dossard: string;
   numeroLicence: string;
   nom: string;
@@ -27,11 +29,11 @@ interface Joueur {
 interface ApiResponse {
   joueurs: Joueur[];
 }
-
 function GetInscriptions() {
   const [players, setPlayers] = useState<Joueur[]>([]);
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState(true);
+  const currentUserId = useCurrentUser();
 
   // Fonction de suppression de joueur
   const handleDeletePlayer = async (idToDelete: number) => {
@@ -115,6 +117,7 @@ function GetInscriptions() {
             key={joueur.id}
             joueur={joueur}
             onDeleteJoueur={handleDeletePlayer}
+            currentUserId={currentUserId}
           />
         ))
       ) : (

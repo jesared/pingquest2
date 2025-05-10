@@ -28,6 +28,7 @@ export default function FormUpdate({ userId }: { userId: string }) {
           body: JSON.stringify({ userId }),
         });
         const result = await res.json();
+
         if (res.ok) {
           setFormData({
             bio: result.bio || "",

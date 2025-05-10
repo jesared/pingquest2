@@ -54,3 +54,34 @@ export const getRole = async (clerkUserId: string) => {
     throw error;
   }
 };
+
+export const getUserId = async (clerkUserId: string) => {
+  const prisma = getPrismaClient();
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkUserId },
+      select: {
+        id: true,
+        role: true, // ajoute ceci si ce n'est pas déjà présent
+      },
+    });
+    return user;
+  } catch (error) {
+    console.error("Error getting role", error);
+    throw error;
+  }
+};
+
+export async function getTournoisByOrganisateur(clerkUserId: string) {
+  const prisma = getPrismaClient();
+  const user = await getUserId(clerkUserId);
+  const tournois = await prisma.tournoi.findMany({
+    where: {
+      userId: user?.id,
+    },
+    orderBy: {
+      debut: "desc",
+    },
+  });
+  return tournois;
+}

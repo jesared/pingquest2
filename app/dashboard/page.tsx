@@ -24,6 +24,7 @@ export default async function DashBoardUser() {
     <div className="max-w-2xl p-4 mx-auto bg-gray-50 rounded-t-xl dark:border-gray-600">
       <CardProfil userId={userId as string} />
       <FormUpdate userId={userId} />
+
       {userRole?.role?.name === "admin" && <ListUsers />}
     </div>
   );

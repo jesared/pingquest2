@@ -1,10 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+
 import { PopoverCard } from "./PoppoverCard";
 
 interface Joueur {
   id: number;
+  userId: string;
   dossard: string;
   numeroLicence: string;
   nom: string;
@@ -24,12 +26,16 @@ interface Joueur {
 interface CardJoueurProps {
   joueur: Joueur;
   onDeleteJoueur?: (id: number) => void;
+  currentUserId?: string | null;
 }
 
 export default function CardPlayer({
   joueur,
   onDeleteJoueur,
+  currentUserId,
 }: CardJoueurProps) {
+  const isOwner = currentUserId === joueur.userId;
+
   const handleSupprimerJoueur = (id: number) => {
     if (onDeleteJoueur) {
       onDeleteJoueur(id);
@@ -42,8 +48,9 @@ export default function CardPlayer({
   return (
     <Card className="w-full max-w-xs hover:bg-muted transition-all duration-300 hover:shadow-xl hover:scale-[1.002] rounded-xl py-2">
       <CardContent className="flex flex-col items-center gap-2 p-4 relative">
-        <PopoverCard joueur={joueur} onDelete={handleSupprimerJoueur} />
-        {/* Avatar */}
+        {isOwner && (
+          <PopoverCard joueur={joueur} onDelete={handleSupprimerJoueur} />
+        )}
         <Avatar className="w-16 h-16">
           <AvatarImage
             src={joueur.photoUrl || "https://github.com/shadcn.png"}

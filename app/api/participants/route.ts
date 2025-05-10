@@ -7,6 +7,7 @@ export async function GET() {
   try {
     const joueurs = await prisma.joueur.findMany({
       select: {
+        userId: true,
         id: true,
         dossard: true,
         numeroLicence: true,
@@ -17,6 +18,7 @@ export async function GET() {
         engagement: {
           select: {
             id: true,
+
             event: {
               select: {
                 id: true,

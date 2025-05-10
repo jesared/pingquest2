@@ -5,6 +5,7 @@ import CardPlayer from "./CardPlayer";
 
 interface Joueur {
   id: number;
+  userId: string;
   dossard: string;
   numeroLicence: string;
   nom: string;
@@ -24,6 +25,46 @@ export default function ClientParticipants() {
   const [joueurs, setJoueurs] = useState<Joueur[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleDeleteJoueur = (id: number) => {
+    setJoueurs((prev) => prev.filter((joueur) => joueur.id !== id));
+  };
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchCurrentUserId() {
+      try {
+        const res = await fetch("/api/getUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({}),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.error(
+            "Erreur lors de la récupération du currentUserId",
+            data
+          );
+          setError("Erreur serveur");
+          return;
+        }
+
+        if (data.id) {
+          setCurrentUserId(data.id);
+        } else {
+          setError("UserId introuvable");
+        }
+      } catch (err) {
+        console.error("Erreur lors de la récupération du currentUserId", err);
+      }
+    }
+
+    fetchCurrentUserId();
+  }, []);
 
   useEffect(() => {
     async function fetchJoueurs() {
@@ -48,7 +89,6 @@ export default function ClientParticipants() {
         setIsLoading(false);
       }
     }
-
     fetchJoueurs();
   }, []);
 
@@ -76,7 +116,12 @@ export default function ClientParticipants() {
   return (
     <>
       {joueurs.map((joueur) => (
-        <CardPlayer key={joueur.id} joueur={joueur} />
+        <CardPlayer
+          key={joueur.id}
+          joueur={joueur}
+          onDeleteJoueur={handleDeleteJoueur}
+          currentUserId={currentUserId}
+        />
       ))}
     </>
   );

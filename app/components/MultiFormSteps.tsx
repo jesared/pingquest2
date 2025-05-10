@@ -19,7 +19,15 @@ const steps = [
   { title: "Confirmation", description: "Vérification finale" },
 ];
 
-export default function MultiStepForm() {
+interface MultiStepFormProps {
+  tournoiId: number;
+  jours: string[];
+}
+
+export default function MultiStepForm({
+  tournoiId,
+  jours,
+}: MultiStepFormProps) {
   const { user } = useUser(); // 👈 Récupération du currentUser Clerk
   const [step, setStep] = useState(1);
   const router = useRouter();
@@ -141,9 +149,21 @@ export default function MultiStepForm() {
         setLoading(true);
         const points = parseInt(watch("pointsOfficiel") || "0", 10);
 
-        const res = await fetch("/api/epreuves"); // 👈 Ton endpoint API qui sort les épreuves
-        const allEpreuves = await res.json();
+        const res = await fetch(`/api/epreuves?tournoiId=${tournoiId}`);
+        // 👈 Ton endpoint API qui sort les épreuves
+        if (!res.ok) {
+          console.error(`Erreur HTTP: ${res.status}`);
+          setError("Erreur lors du chargement des épreuves depuis l'API.");
+          setLoading(false);
+          return; // Stop further processing
+        }
+        const data = await res.json();
+        const allEpreuves = Array.isArray(data) ? data : data.epreuves;
 
+        if (!Array.isArray(allEpreuves)) {
+          throw new Error("Le format des épreuves est invalide");
+        }
+        console.log("first", allEpreuves);
         const accessibles = allEpreuves.filter(
           (e: { minPoints: number; maxPoints: number }) => {
             return points >= e.minPoints && points <= e.maxPoints;
@@ -162,7 +182,7 @@ export default function MultiStepForm() {
     if (step === 2) {
       fetchEpreuves();
     }
-  }, [step, watch]);
+  }, [step, watch, tournoiId]);
 
   const validateStep = async (nextStep: number) => {
     const fieldMap: Record<number, (keyof FormData)[]> = {
@@ -297,8 +317,46 @@ export default function MultiStepForm() {
                   ) : (
                     <>
                       <div className="grid grid-cols-3 gap-4">
+                        {jours.map((jour, i) => {
+                          // Add your logic here for rendering each 'jour'
+                          return (
+                            <div key={i}>
+                              <h3 className="text-lg font-semibold  mb-2">
+                                {jour}
+                              </h3>
+                              <div className="flex flex-col gap-1">
+                                {epreuves
+                                  .filter(
+                                    (e) =>
+                                      e.jour.toLowerCase() ===
+                                      jour.toLowerCase()
+                                  )
+                                  .map((e) => (
+                                    <label
+                                      key={e.id}
+                                      className="flex items-center space-x-2 cursor-pointer"
+                                    >
+                                      <Input
+                                        type="checkbox"
+                                        value={e.id}
+                                        {...register("epreuves")}
+                                        className="hidden peer"
+                                      />
+                                      <span
+                                        className="ml-2 px-2 py-1 rounded-md border transition
+    peer-checked:border-accent peer-checked:bg-accent "
+                                      >
+                                        {e.tableau} ({e.categorie})
+                                      </span>
+                                    </label>
+                                  ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+
                         {/* Colonne Samedi */}
-                        <div>
+                        {/* <div>
                           <h3 className="text-lg font-semibold  mb-2">
                             Samedi
                           </h3>
@@ -325,15 +383,15 @@ export default function MultiStepForm() {
                                 </label>
                               ))}
                           </div>
-                        </div>
+                        </div> */}
                         {/* Colonne Dimanche */}
-                        <div>
+                        {/* <div>
                           <h3 className="text-lg font-semibold mb-2">
                             Dimanche
                           </h3>
                           <div className="flex flex-col gap-1">
                             {epreuves
-                              .filter((e) => e.jour === "dimanche")
+                              .filter((e) => e.jour === "Dimanche")
                               .map((e) => (
                                 <label
                                   key={e.id}
@@ -354,9 +412,9 @@ export default function MultiStepForm() {
                                 </label>
                               ))}
                           </div>
-                        </div>
+                        </div> */}
 
-                        {/* Colonne Lundi */}
+                        {/* Colonne Lundi
                         <div>
                           <h3 className="text-lg font-semibold mb-2">Lundi</h3>
                           <div className="flex flex-col gap-1">
@@ -382,7 +440,7 @@ export default function MultiStepForm() {
                                 </label>
                               ))}
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <Button

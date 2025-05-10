@@ -5,6 +5,7 @@ export async function GET(req: Request) {
   const prisma = getPrismaClient();
 
   const { searchParams } = new URL(req.url);
+
   const tournoiIdParam = searchParams.get("tournoiId");
   const tournoiId = tournoiIdParam ? parseInt(tournoiIdParam) : null;
 
@@ -14,7 +15,7 @@ export async function GET(req: Request) {
       { status: 400 }
     );
   }
-
+  console.log("tournoiId", tournoiId);
   try {
     const epreuves = await prisma.event.findMany({
       where: {
@@ -23,7 +24,6 @@ export async function GET(req: Request) {
       select: {
         id: true,
         nom: true,
-        date: true,
         jour: true,
         heure: true,
         tableau: true,

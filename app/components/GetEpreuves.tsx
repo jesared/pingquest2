@@ -12,9 +12,9 @@ import {
 import Link from "next/link";
 
 // Fonction pour récupérer les épreuves depuis ton API
-async function fetchEpreuves() {
+async function fetchEpreuves(tournoiId: number) {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_SITE_URL}/api/epreuves`,
+    `${process.env.NEXT_PUBLIC_SITE_URL}/api/epreuves?tournoiId=${tournoiId}`,
     {
       next: { revalidate: 60 }, // Cache pendant 60 secondes
     }
@@ -34,19 +34,23 @@ interface Epreuve {
   prixAnticipe: number;
   prixSurPlace: number;
 }
-
-const GetEpreuves = async () => {
+interface GetEpreuvesProps {
+  tournoiId: number;
+}
+const GetEpreuves = async ({ tournoiId }: GetEpreuvesProps) => {
   let epreuves: Epreuve[] = [];
 
   try {
-    epreuves = await fetchEpreuves();
+    epreuves = await fetchEpreuves(tournoiId);
   } catch (error) {
     console.error("Erreur lors de la récupération des épreuves:", error);
   }
   return (
     <Table>
       <TableCaption>
-        <Link href="">Pdf règlement du tournoi</Link>
+        <Link href="#" title="Pdf du réglement">
+          Pdf règlement du tournoi
+        </Link>
       </TableCaption>
       <TableHeader>
         <TableRow>

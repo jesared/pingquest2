@@ -15,3 +15,5 @@ export interface UserTypeData {
     name: string;
   };
 }
+// Par exemple dans types/event.ts
+export type EtatEvent = "OUVERT" | "COMPLET" | "ANNULÉ";
