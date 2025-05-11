@@ -130,7 +130,6 @@ const EditTournoi = () => {
 
   return (
     <div className="@max-xs:w-full max-w-3xl mx-auto py-10 px-4">
-      <p>Form modifié : {isFormModified ? "Oui" : "Non"}</p>
       <Card>
         <CardHeader>
           <div className="flex justify-between">

@@ -147,6 +147,7 @@ export default function MultiStepForm({
       const joueurCheck = await fetch(
         `/api/joueurs/existe?licence=${data.numeroLicence}`
       );
+
       const joueurExiste = await joueurCheck.json();
 
       let joueurId;
@@ -176,22 +177,29 @@ export default function MultiStepForm({
           throw new Error("Erreur lors de la création du joueur");
 
         const nouveauJoueur = await response.json();
-        joueurId = nouveauJoueur.id;
+        joueurId = nouveauJoueur.joueur.id;
       }
 
-      const engagements = epreuves.map((epreuve) => ({
-        eventId: parseInt(epreuve.id, 10),
-        modePaiement: "Anticipé", // ou autre, selon ton UI
-      }));
+      const engagements = epreuves
+        .filter((e) => e.id !== undefined && !isNaN(Number(e.id)))
+        .map((e) => ({
+          eventId: Number(e.id),
+          modePaiement: "Anticipé",
+        }));
 
-      const engagementResponse = await fetch("/api/engagements", {
+      if (engagements.length === 0) {
+        throw new Error("Aucune épreuve valide sélectionnée.");
+      }
+
+      const res = await fetch("/api/engagements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ joueurId, engagements }),
       });
 
-      if (!engagementResponse.ok) {
-        throw new Error("Erreur lors de la création des engagements");
+      if (!res.ok) {
+        const error = await res.text(); // ou .json() si tu retournes un JSON
+        throw new Error("Erreur lors de la création des engagements: " + error);
       }
 
       confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });

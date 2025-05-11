@@ -5,6 +5,9 @@ import { Award, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+type GetUserRoleResponse = {
+  role?: { name: string };
+};
 
 export default function RoleTournoiButton() {
   const [role, setRole] = useState<string | null>(null);
@@ -16,7 +19,7 @@ export default function RoleTournoiButton() {
 
   useEffect(() => {
     const fetchRole = async () => {
-      if (!user || !user.id) {
+      if (!user || !user.id || !user.publicMetadata) {
         setLoading(false);
         return;
       }
@@ -37,7 +40,7 @@ export default function RoleTournoiButton() {
           return;
         }
 
-        const data = await res.json();
+        const data: GetUserRoleResponse = await res.json();
 
         if (data.role) {
           setRole(data.role.name);
@@ -80,18 +83,18 @@ export default function RoleTournoiButton() {
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton
-          className={isDashboardTournois ? "bg-primary text-white" : ""}
+        <Link
+          href="/dashboard/tournois"
+          title="Vos tournois"
+          className="flex items-center space-x-2"
         >
-          <Link
-            href="/dashboard/tournois"
-            title="Vos tournois"
-            className="flex items-center space-x-2"
+          <SidebarMenuButton
+            className={isDashboardTournois ? "bg-primary text-white" : ""}
           >
             <Award size={18} className="shrink-0" />
             <span className="text-[16px]">Mes tournois</span>
-          </Link>
-        </SidebarMenuButton>
+          </SidebarMenuButton>
+        </Link>
       </SidebarMenuItem>
     </>
   );

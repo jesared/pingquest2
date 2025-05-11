@@ -3,9 +3,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request, context: any) {
   const prisma = getPrismaClient();
-  try {
-    const { id } = context;
+  const { params } = await context;
+  const id = parseInt(params.id, 10);
 
+  try {
     if (!id) {
       return NextResponse.json({ error: "ID non fourni" }, { status: 400 });
     }

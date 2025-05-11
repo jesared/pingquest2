@@ -63,23 +63,6 @@ export async function POST(request: Request) {
       },
     });
 
-    // Création des engagements si des épreuves sont sélectionnées
-    if (
-      data.epreuves &&
-      Array.isArray(data.epreuves) &&
-      data.epreuves.length > 0
-    ) {
-      const engagementsData = data.epreuves.map((epreuveId: string) => ({
-        joueurId: joueur.id,
-        eventId: parseInt(epreuveId, 10), // Forcer en nombre
-      }));
-
-      await prisma.engagement.createMany({
-        data: engagementsData,
-        skipDuplicates: true,
-      });
-    }
-
     return NextResponse.json({ joueur }, { status: 201 });
   } catch (error) {
     console.error(
