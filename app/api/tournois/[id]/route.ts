@@ -1,10 +1,8 @@
 import { getPrismaClient } from "@/lib/prisma";
-import { Tournoi } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request, context: any) {
   const prisma = getPrismaClient();
-
   try {
     const { id } = context;
 
@@ -36,10 +34,12 @@ export async function GET(req: Request, context: any) {
 }
 
 export async function PUT(req: Request, context: any) {
-  const prisma = getPrismaClient();
-  try {
-    const { id } = context;
+  const { params } = await context;
+  const id = parseInt(params.id, 10);
 
+  const prisma = getPrismaClient();
+
+  try {
     const body = await req.json();
 
     const {
@@ -55,10 +55,10 @@ export async function PUT(req: Request, context: any) {
       endDate,
       epreuves,
       deletedEpreuves,
-      // Tableau d'épreuves depuis le formulaire
     } = body;
 
-    const dataToUpdate: Partial<Tournoi> = {};
+    // Construction dynamique des champs à mettre à jour
+    const dataToUpdate: any = {};
     if (nom !== undefined) dataToUpdate.nom = nom;
     if (lieu !== undefined) dataToUpdate.lieu = lieu;
     if (description !== undefined) dataToUpdate.description = description;
@@ -78,8 +78,8 @@ export async function PUT(req: Request, context: any) {
       data: dataToUpdate,
     });
 
-    // Gestion des épreuves
-    if (deletedEpreuves && Array.isArray(deletedEpreuves)) {
+    // Suppression des épreuves
+    if (Array.isArray(deletedEpreuves) && deletedEpreuves.length > 0) {
       await prisma.event.deleteMany({
         where: {
           id: {
@@ -89,52 +89,49 @@ export async function PUT(req: Request, context: any) {
       });
     }
 
-    if (epreuves && Array.isArray(epreuves)) {
-      for (const epreuveData of epreuves) {
-        if (epreuveData.id && typeof epreuveData.id === "number") {
-          // Mise à jour d'une épreuve existante
+    // Ajout ou mise à jour des épreuves
+    if (Array.isArray(epreuves)) {
+      for (const epreuve of epreuves) {
+        if (epreuve.id) {
           await prisma.event.update({
-            where: { id: epreuveData.id },
+            where: { id: epreuve.id },
             data: {
-              nom: epreuveData.nom,
-              categorie: epreuveData.categorie,
-              jour: epreuveData.jour,
-              heure: epreuveData.heure,
-              tableau: epreuveData.nom,
-
-              // ... autres propriétés
+              nom: epreuve.nom,
+              categorie: epreuve.categorie,
+              jour: epreuve.jour,
+              heure: epreuve.heure,
+              tableau: epreuve.nom,
+              prixAnticipe: epreuve.prixAnticipe ?? 8,
+              prixSurPlace: epreuve.prixSurPlace ?? 8,
+              date: new Date(), // ou epreuve.date ?
             },
           });
         } else {
-          // Création d'une nouvelle épreuve
           await prisma.event.create({
             data: {
-              nom: epreuveData.nom,
-              categorie: epreuveData.categorie,
-              jour: epreuveData.jour,
-              heure: epreuveData.heure,
-              date: new Date(),
-              tableau: epreuveData.nom,
-              prixAnticipe: 8,
-              prixSurPlace: 8,
+              nom: epreuve.nom,
+              categorie: epreuve.categorie,
+              jour: epreuve.jour,
+              heure: epreuve.heure,
+              tableau: epreuve.nom,
+              prixAnticipe: epreuve.prixAnticipe ?? 8,
+              prixSurPlace: epreuve.prixSurPlace ?? 8,
+              date: new Date(), // ou epreuve.date ?
               tournoi: { connect: { id } },
-              // ... autres propriétés (sans inclure l'ID)
             },
           });
         }
       }
     }
 
-    return NextResponse.json(dataToUpdate);
-
-    return NextResponse.json(updatedTournoi);
+    return NextResponse.json(updatedTournoi); // ✅ garde uniquement celui-ci
   } catch (error) {
     console.error("[TOURNOI_PUT]", error);
-    return new NextResponse(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         message: "Erreur lors de la mise à jour du tournoi",
         details: error instanceof Error ? error.message : "Unknown error",
-      }),
+      },
       { status: 500 }
     );
   }

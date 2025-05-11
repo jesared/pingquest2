@@ -42,6 +42,18 @@ model Role {
   name String @unique
   users User[]
 }
+model InscriptionTournoi {
+  id         Int      @id @default(autoincrement())
+  joueurId   Int
+  tournoiId  Int
+  createdAt  DateTime @default(now())
+
+  joueur     Joueur   @relation(fields: [joueurId], references: [id], onDelete: Cascade)
+  tournoi    Tournoi  @relation(fields: [tournoiId], references: [id], onDelete: Cascade)
+
+  @@unique([joueurId, tournoiId]) // empêche double inscription
+}
+
 model Joueur {
   id             Int      @id @default(autoincrement())
   dossard        Int   @unique
@@ -56,6 +68,7 @@ model Joueur {
   createdAt      DateTime @default(now())
 
   engagement Engagement[]
+inscriptionsTournoi InscriptionTournoi[]
 
   user       User      @relation(fields: [userId], references: [id])
 }
@@ -76,6 +89,8 @@ model Tournoi {
   updatedAt           DateTime       @updatedAt
   userId              String
   user                User           @relation(fields: [userId], references: [id])
+  joueursInscrits InscriptionTournoi[]
+
   events              Event[]
 }
 

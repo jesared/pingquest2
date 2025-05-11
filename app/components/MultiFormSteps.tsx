@@ -52,9 +52,37 @@ export default function MultiStepForm({
 
   const fetchFromLicence = async () => {
     const licence = watch("numeroLicence");
-    if (!licence) return;
+    try {
+      const res = await fetch("/api/verif-joueur", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tournoiId, numeroLicence: licence }),
+      });
 
-    setLoadingFftt(true);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Erreur inconnue");
+        return; // 👈 stop ici
+      }
+
+      if (data.status === "deja_inscrit") {
+        setError("Ce joueur est déjà inscrit à ce tournoi.");
+
+        return; // 👈 stop ici aussi
+      }
+
+      if (data.status === "inscriptible" || data.status === "non_inscrit") {
+        setError(null);
+        setStep(2); // 👈 avancer uniquement si tout est OK
+      }
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoadingFftt(false);
+    }
 
     try {
       const response = await fetch(
@@ -115,29 +143,60 @@ export default function MultiStepForm({
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
     try {
-      // Récupérer le dernier dossard existant
-      const dossardResponse = await fetch("/api/dernier-dossard");
-      const { dernierDossard } = await dossardResponse.json();
+      // 1. Vérifier si le joueur existe déjà
+      const joueurCheck = await fetch(
+        `/api/joueurs/existe?licence=${data.numeroLicence}`
+      );
+      const joueurExiste = await joueurCheck.json();
 
-      const joueurData = {
-        ...data,
-        userClerkId: user?.id,
-        dossard: (dernierDossard || 0) + 1, // s'il n'y a aucun dossard, on commence à 1
-      };
+      let joueurId;
 
-      const response = await fetch("/api/joueurs", {
+      if (joueurExiste?.id) {
+        // Le joueur existe déjà
+        joueurId = joueurExiste.id;
+      } else {
+        // 2. Récupérer le dernier dossard
+        const dossardResponse = await fetch("/api/dernier-dossard");
+        const { dernierDossard } = await dossardResponse.json();
+
+        // 3. Créer le joueur
+        const joueurData = {
+          ...data,
+          userClerkId: user?.id,
+          dossard: (dernierDossard || 0) + 1,
+        };
+
+        const response = await fetch("/api/joueurs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(joueurData),
+        });
+
+        if (!response.ok)
+          throw new Error("Erreur lors de la création du joueur");
+
+        const nouveauJoueur = await response.json();
+        joueurId = nouveauJoueur.id;
+      }
+
+      const engagements = epreuves.map((epreuve) => ({
+        eventId: parseInt(epreuve.id, 10),
+        modePaiement: "Anticipé", // ou autre, selon ton UI
+      }));
+
+      const engagementResponse = await fetch("/api/engagements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(joueurData),
+        body: JSON.stringify({ joueurId, engagements }),
       });
 
-      if (response.ok) {
-        confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
-        // Affiche le message de succès
-        setSuccessMessage(true);
-
-        setTimeout(() => router.push("/dashboard/inscriptions"), 2000);
+      if (!engagementResponse.ok) {
+        throw new Error("Erreur lors de la création des engagements");
       }
+
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+      setSuccessMessage(true);
+      setTimeout(() => router.push("/dashboard/inscriptions"), 2000);
     } catch (error) {
       console.error(error);
     }
@@ -151,7 +210,6 @@ export default function MultiStepForm({
 
         const res = await fetch(`/api/epreuves?tournoiId=${tournoiId}`);
 
-        console.log("res", res);
         // 👈 Ton endpoint API qui sort les épreuves
         if (!res.ok) {
           console.error(`Erreur HTTP: ${res.status}`);
@@ -236,6 +294,8 @@ export default function MultiStepForm({
                   required
                   readOnly={licenceVerrouillee}
                 />
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
                 {licenceVerrouillee && (
                   <Button
                     type="button"
@@ -306,7 +366,7 @@ export default function MultiStepForm({
               {step === 2 && (
                 <div className="space-y-8">
                   <h2 className="text-2xl font-bold ">Choix des épreuves</h2>
-                  {/* prevoir un chargement des épruves */}
+                  {/* prevoir un chargement des épreuves */}
                   {loading ? (
                     <div className="flex justify-center items-center">
                       <p className="text-gray-500">
@@ -356,93 +416,6 @@ export default function MultiStepForm({
                             </div>
                           );
                         })}
-
-                        {/* Colonne Samedi */}
-                        {/* <div>
-                          <h3 className="text-lg font-semibold  mb-2">
-                            Samedi
-                          </h3>
-                          <div className="flex flex-col gap-1">
-                            {epreuves
-                              .filter((e) => e.jour === "samedi")
-                              .map((e) => (
-                                <label
-                                  key={e.id}
-                                  className="flex items-center space-x-2 cursor-pointer"
-                                >
-                                  <Input
-                                    type="checkbox"
-                                    value={e.id}
-                                    {...register("epreuves")}
-                                    className="hidden peer"
-                                  />
-                                  <span
-                                    className="ml-2 px-2 py-1 rounded-md border transition
-    peer-checked:border-accent peer-checked:bg-accent "
-                                  >
-                                    {e.tableau} ({e.categorie})
-                                  </span>
-                                </label>
-                              ))}
-                          </div>
-                        </div> */}
-                        {/* Colonne Dimanche */}
-                        {/* <div>
-                          <h3 className="text-lg font-semibold mb-2">
-                            Dimanche
-                          </h3>
-                          <div className="flex flex-col gap-1">
-                            {epreuves
-                              .filter((e) => e.jour === "Dimanche")
-                              .map((e) => (
-                                <label
-                                  key={e.id}
-                                  className="flex items-center space-x-2 cursor-pointer"
-                                >
-                                  <Input
-                                    type="checkbox"
-                                    value={e.id}
-                                    {...register("epreuves")}
-                                    className="hidden peer"
-                                  />
-                                  <span
-                                    className="ml-2 px-2 py-1 rounded-md border transition
-    peer-checked:border-accent peer-checked:bg-accent"
-                                  >
-                                    {e.tableau} ({e.categorie})
-                                  </span>
-                                </label>
-                              ))}
-                          </div>
-                        </div> */}
-
-                        {/* Colonne Lundi
-                        <div>
-                          <h3 className="text-lg font-semibold mb-2">Lundi</h3>
-                          <div className="flex flex-col gap-1">
-                            {epreuves
-                              .filter((e) => e.jour === "lundi")
-                              .map((e) => (
-                                <label
-                                  key={e.id}
-                                  className="flex items-center space-x-2 cursor-pointer"
-                                >
-                                  <Input
-                                    type="checkbox"
-                                    value={e.id}
-                                    {...register("epreuves")}
-                                    className="hidden peer"
-                                  />
-                                  <span
-                                    className="ml-2 px-2 py-1 rounded-md border transition
-    peer-checked:border-accent peer-checked:bg-accent"
-                                  >
-                                    {e.tableau} ({e.categorie})
-                                  </span>
-                                </label>
-                              ))}
-                          </div>
-                        </div> */}
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <Button

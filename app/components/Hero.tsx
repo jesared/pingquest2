@@ -3,12 +3,12 @@
 // this is a client component
 
 import { Plus } from "lucide-react";
-import Link from "next/link";
-
 import Image from "next/image";
+import Link from "next/link";
+import Typewriter from "typewriter-effect";
 
 export const Hero = () => {
-  // const talkAbout = ["Rejoignez", "Participez", "Découvrez", "Partagez"];
+  const talkAbout = ["Rejoignez", "Participez", "Découvrez", "Partagez"];
 
   return (
     <main className="overflow-hidden">
@@ -73,8 +73,18 @@ export const Hero = () => {
             <p className="text-primary/60 py-4">
               L&apos;aventure ultime du tennis de table : inscrivez-vous, défiez
               vos limites, et vivez l&apos;expérience !{" "}
-              <span className="text-blue-500 font-semibold">Rejoignez</span>
-              avec PingQuest, le frisson de la compétition à portée de clic.
+              <div className="flex justify-center">
+                <span className="text-blue-500 font-semibold">
+                  <Typewriter
+                    options={{
+                      strings: talkAbout,
+                      autoStart: true,
+                      loop: true,
+                    }}
+                  />
+                </span>
+                avec PingQuest, le frisson de la compétition à portée de clic.
+              </div>
             </p>
           </div>
         </div>

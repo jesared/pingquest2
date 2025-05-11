@@ -10,9 +10,8 @@ interface InscriptionProps {
 
 export default async function Inscription({ searchParams }: InscriptionProps) {
   const search = searchParams ? await searchParams : {};
-  console.log("searchParams.tournoiId:", search);
 
-  const tournoiId = Number(search);
+  const tournoiId = Number(search.tournoiId);
 
   const { userId } = await auth();
   const prisma = getPrismaClient();
