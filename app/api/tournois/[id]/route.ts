@@ -20,8 +20,9 @@ export async function GET(
 ) {
   try {
     // Validation des paramètres
-    const { id } = context.params;
-    const result = paramsSchema.safeParse(context.params);
+    const params = await context.params;
+    const { id } = params;
+    const result = paramsSchema.safeParse(params);
 
     if (!result.success) {
       return NextResponse.json({ error: "ID invalide" }, { status: 400 });
@@ -30,7 +31,7 @@ export async function GET(
     const prisma = getPrismaClient();
 
     const tournoi = await prisma.tournoi.findUnique({
-      where: { id },
+      where: { id: Number(id) },
       include: {
         events: {
           orderBy: {
