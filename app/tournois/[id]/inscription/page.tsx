@@ -1,48 +1,33 @@
+// app/(inscription)/inscription/page.tsx
 import GenererJoursTournoi from "@/app/components/GenererJoursTournoi";
-import MultiStepForm from "@/app/components/MultiFormSteps";
+import InscriptionClient from "@/app/components/InscriptionClient";
 import { getPrismaClient } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-interface InscriptionProps {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+// interface InscriptionProps {
+//   searchParams?: { [key: string]: string | string[] | undefined };
+//   tournoiId?: string | string[]; // Add tournoiId property
+// }
 
-export default async function Inscription({ searchParams }: InscriptionProps) {
-  const search = searchParams ? await searchParams : {};
-
-  const tournoiId = Number(search.tournoiId);
+export default async function Page(props: any) {
+  const { searchParams } = props;
+  const tournoiId = Number(searchParams?.tournoiId);
 
   const { userId } = await auth();
-  const prisma = getPrismaClient();
+  if (!userId) redirect("/sign-in");
 
-  if (!userId) {
-    redirect("/sign-in");
+  const prisma = getPrismaClient();
+  const tournoi = await prisma.tournoi.findUnique({
+    where: { id: tournoiId },
+    include: { events: true },
+  });
+
+  if (!tournoi) {
+    return <p>Tournoi introuvable.</p>;
   }
 
-  const tournoi = tournoiId
-    ? await prisma.tournoi.findUnique({
-        where: { id: tournoiId },
-        include: {
-          events: true,
-        },
-      })
-    : null;
-  const jours = GenererJoursTournoi(
-    tournoi?.debut ?? new Date(),
-    tournoi?.fin ?? new Date()
-  );
+  const jours = GenererJoursTournoi(tournoi.debut, tournoi.fin);
 
-  return (
-    <div className="max-w-2xl mx-auto p-4 border border-gray-200 bg-gray-50 rounded-t-xl px-4">
-      <div className="text-center mb-4">
-        <h1 className="text-2xl font-bold">Ajout au tournoi</h1>
-        <span>{tournoi?.nom || "Nom non défini"}</span>
-        <p className="text-gray-500">Inscrire un joueur</p>
-      </div>{" "}
-      {tournoiId !== null && (
-        <MultiStepForm tournoiId={tournoiId} jours={jours} />
-      )}
-    </div>
-  );
+  return <InscriptionClient tournoi={tournoi} jours={jours} />;
 }

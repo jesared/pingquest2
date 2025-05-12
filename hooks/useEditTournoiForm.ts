@@ -28,6 +28,8 @@ export const useEditTournoiForm = (tournoiId: number) => {
     responsableTelephone: string;
     debut?: string;
     fin?: string;
+    prixAnticipe?: string;
+    prixSurPlace?: string;
   };
 
   const [tournoi, setTournoi] = useState<Tournoi | null>(null);
@@ -67,27 +69,31 @@ export const useEditTournoiForm = (tournoiId: number) => {
         const res = await fetch(`/api/tournois/${tournoiId}`);
         if (!res.ok) throw new Error("Erreur tournoi");
         const data = await res.json();
-        setTournoi(data);
+        const tournoiData = data.data;
+        setTournoi(tournoiData);
         setFormValues((prev) => ({
           ...prev,
-          nom: data.nom || "",
-          lieu: data.lieu || "",
-          description: data.description || "",
-          responsableNom: data.responsableNom || "",
-          email: data.responsableEmail || "",
-          telephone: data.responsableTelephone || "",
-          startDate: data.debut ? new Date(data.debut) : undefined,
-          endDate: data.fin ? new Date(data.fin) : undefined,
+          nom: tournoiData.nom || "",
+          lieu: tournoiData.lieu || "",
+          description: tournoiData.description || "",
+          responsableNom: tournoiData.responsableNom || "",
+          email: tournoiData.responsableEmail || "",
+          telephone: tournoiData.responsableTelephone || "",
+          startDate: tournoiData.debut
+            ? new Date(tournoiData.debut)
+            : undefined,
+          endDate: tournoiData.fin ? new Date(tournoiData.fin) : undefined,
         }));
 
         const epreuvesRes = await fetch(`/api/epreuves?tournoiId=${tournoiId}`);
 
         if (!epreuvesRes.ok) throw new Error("Erreur épreuves");
         const dataEpreuves = await epreuvesRes.json();
-        const transformed = dataEpreuves.map((e: Epreuve) => ({
+
+        const transformed = dataEpreuves.map((e: Tournoi) => ({
           ...e,
-          tarif: e.tarif,
-          tarifPlace: e.tarifPlace,
+          tarif: e.prixAnticipe,
+          tarifPlace: e.prixSurPlace,
         }));
 
         setFormValues((prev) => ({ ...prev, epreuves: transformed }));
@@ -164,16 +170,6 @@ export const useEditTournoiForm = (tournoiId: number) => {
   };
 
   const isFormValid = () => {
-    console.log("Validation des épreuves :", formValues.epreuves);
-    formValues.epreuves.forEach((e, i) => {
-      console.log(`Épreuve ${i} :`, {
-        nom: !!e.nom,
-        jour: !!e.jour,
-        heure: !!e.heure,
-        tarif: !!e.tarif,
-        tarifPlace: !!e.tarifPlace,
-      });
-    });
     const {
       nom,
       lieu,
@@ -186,6 +182,9 @@ export const useEditTournoiForm = (tournoiId: number) => {
       epreuves,
     } = formValues;
 
+    // Vérifie qu'il y a au moins une épreuve
+    const hasAtLeastOneEpreuve = epreuves.length > 0;
+
     const baseValid =
       nom &&
       lieu &&
@@ -195,26 +194,8 @@ export const useEditTournoiForm = (tournoiId: number) => {
       telephone &&
       startDate &&
       endDate;
-
-    // Valider toutes les épreuves existantes (isNew !== true)
-    const anciennesEpreuvesValides = epreuves
-      .filter((e) => !e.isNew)
-      .every((e) => e.nom && e.jour && e.heure && e.tarif && e.tarifPlace);
-
-    // Valider seulement les nouvelles épreuves si elles sont remplies partiellement
-    const nouvellesEpreuvesPartiellementRemplies = epreuves
-      .filter((e) => e.isNew)
-      .some((e) => e.nom || e.jour || e.heure || e.tarif || e.tarifPlace);
-
-    const nouvellesEpreuvesValides = epreuves
-      .filter((e) => e.isNew)
-      .every((e) => e.nom && e.jour && e.heure && e.tarif && e.tarifPlace);
-
-    return (
-      !!baseValid &&
-      anciennesEpreuvesValides &&
-      (!nouvellesEpreuvesPartiellementRemplies || nouvellesEpreuvesValides)
-    );
+    // On ne vérifie pas les champs de la nouvelle épreuve ici !
+    return !!baseValid && hasAtLeastOneEpreuve;
   };
 
   const jours =

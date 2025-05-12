@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
     const { joueurId, engagements } = data;
-    console.log("data", data);
+
     if (!joueurId || !Array.isArray(engagements)) {
       return NextResponse.json(
         { error: "Données manquantes ou invalides" },

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormData } from "../../types/form";
+import JourEpreuvesSelector from "./JourEpreuvesSelector";
 import ProgressBar from "./ProgressBar";
 
 const steps = [
@@ -22,11 +23,13 @@ const steps = [
 interface MultiStepFormProps {
   tournoiId: number;
   jours: string[];
+  onFfttJoueurDetecte?: (joueur: { nom: string; prenom: string }) => void;
 }
 
 export default function MultiStepForm({
   tournoiId,
   jours,
+  onFfttJoueurDetecte,
 }: MultiStepFormProps) {
   const { user } = useUser(); // 👈 Récupération du currentUser Clerk
   const [step, setStep] = useState(1);
@@ -76,7 +79,7 @@ export default function MultiStepForm({
 
       if (data.status === "inscriptible" || data.status === "non_inscrit") {
         setError(null);
-        setStep(2); // 👈 avancer uniquement si tout est OK
+        // setStep(2); // 👈 avancer uniquement si tout est OK
       }
     } catch (err) {
       setError((err as Error).message);
@@ -109,7 +112,9 @@ export default function MultiStepForm({
         setValue("club", data.club || "");
         setValue("pointsOfficiel", data.pointsOfficiel || "");
         setValue("dossard", data.dossard || "");
-
+        if (onFfttJoueurDetecte) {
+          onFfttJoueurDetecte({ nom: data.nom, prenom: data.prenom });
+        }
         setLicenceVerrouillee(true); // ➡️ On verrouille le champ
         toast.success(`Joueur trouvé : ${data.nom} ${data.prenom}`); // 🎉 Petit succès
       } else {
@@ -179,7 +184,22 @@ export default function MultiStepForm({
         const nouveauJoueur = await response.json();
         joueurId = nouveauJoueur.joueur.id;
       }
+      const selectedIds = watch("epreuves") || [];
 
+      // ⚠️ Vérifie que chaque ID sélectionné correspond à une épreuve autorisée
+      const invalidSelections = selectedIds.filter((id) => {
+        const epreuve = epreuves.find(
+          (e) => e.id === id || e.id.toString() === id
+        );
+        return !epreuve; // l'ID ne correspond à aucune épreuve accessible
+      });
+
+      if (invalidSelections.length > 0) {
+        toast.error(
+          "Vous avez sélectionné un ou plusieurs tableaux non autorisés."
+        );
+        return;
+      }
       const engagements = epreuves
         .filter((e) => e.id !== undefined && !isNaN(Number(e.id)))
         .map((e) => ({
@@ -301,6 +321,7 @@ export default function MultiStepForm({
                   placeholder="Numéro de Licence"
                   required
                   readOnly={licenceVerrouillee}
+                  className="focus:bg-accent"
                 />
                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
@@ -339,21 +360,26 @@ export default function MultiStepForm({
                 {/* Montre les autres champs uniquement si le nom a été récupéré */}
                 {watch("nom") && (
                   <div className="grid grid-cols-2 gap-4">
-                    <Input {...register("nom")} placeholder="Nom" readOnly />
-                    {errors.nom && (
-                      <p className="text-red-500 text-xs">
-                        {errors.nom.message}
-                      </p>
-                    )}
-
                     <Input
                       {...register("prenom")}
                       placeholder="Prénom"
                       readOnly
+                      className="bg-accent"
                     />
                     {errors.prenom && (
                       <p className="text-red-500 text-xs">
                         {errors.prenom.message}
+                      </p>
+                    )}
+                    <Input
+                      {...register("nom")}
+                      placeholder="Nom"
+                      readOnly
+                      className="bg-accent"
+                    />
+                    {errors.nom && (
+                      <p className="text-red-500 text-xs">
+                        {errors.nom.message}
                       </p>
                     )}
                   </div>
@@ -386,45 +412,11 @@ export default function MultiStepForm({
                     <p className="text-red-500">{error}</p>
                   ) : (
                     <>
-                      <div className="grid grid-cols-3 gap-4">
-                        {jours.map((jour, i) => {
-                          // Add your logic here for rendering each 'jour'
-                          return (
-                            <div key={i}>
-                              <h3 className="text-lg font-semibold  mb-2">
-                                {jour}
-                              </h3>
-                              <div className="flex flex-col gap-1">
-                                {epreuves
-                                  .filter(
-                                    (e) =>
-                                      e.jour.toLowerCase() ===
-                                      jour.toLowerCase()
-                                  )
-                                  .map((e) => (
-                                    <label
-                                      key={e.id}
-                                      className="flex items-center space-x-2 cursor-pointer"
-                                    >
-                                      <Input
-                                        type="checkbox"
-                                        value={e.id}
-                                        {...register("epreuves")}
-                                        className="hidden peer"
-                                      />
-                                      <span
-                                        className="ml-2 px-2 py-1 rounded-md border transition
-    peer-checked:border-accent peer-checked:bg-accent "
-                                      >
-                                        {e.tableau} ({e.categorie})
-                                      </span>
-                                    </label>
-                                  ))}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                      <JourEpreuvesSelector
+                        jours={jours}
+                        epreuves={epreuves}
+                        register={register}
+                      />
                       <div className="grid grid-cols-2 gap-4">
                         <Button
                           className="w-full"

@@ -49,7 +49,7 @@ export default async function Page({
   if (tournoi.statut === "BROUILLON" && !isOwner) {
     return notFound();
   }
-
+  console.log("tournoi", tournoi);
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 max-w-3xl">

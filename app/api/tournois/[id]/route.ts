@@ -1,20 +1,49 @@
 import { getPrismaClient } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
-export async function GET(req: Request, context: any) {
-  const prisma = getPrismaClient();
-  const { params } = await context;
-  const id = parseInt(params.id, 10);
+// Schéma de validation pour l'ID
+const paramsSchema = z.object({
+  id: z.string().transform((val) => parseInt(val, 10)),
+});
 
+// Type pour le context
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
+export async function GET(
+  req: NextRequest,
+  context: any /* or RouteContext */
+) {
   try {
-    if (!id) {
-      return NextResponse.json({ error: "ID non fourni" }, { status: 400 });
+    // Validation des paramètres
+    const { id } = context.params;
+    const result = paramsSchema.safeParse(context.params);
+
+    if (!result.success) {
+      return NextResponse.json({ error: "ID invalide" }, { status: 400 });
     }
+
+    const prisma = getPrismaClient();
+
     const tournoi = await prisma.tournoi.findUnique({
-      where: { id: Number(id) }, // Convertir l'ID en nombre
+      where: { id },
       include: {
-        events: true,
-        user: true,
+        events: {
+          orderBy: {
+            date: "asc",
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -25,17 +54,21 @@ export async function GET(req: Request, context: any) {
       );
     }
 
-    return NextResponse.json(tournoi);
+    return NextResponse.json({ data: tournoi });
   } catch (error) {
-    console.error("Erreur lors de la récupération du tournoi :", error);
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect(); // Fermer la connexion à Prisma
+    console.error("[TOURNOI_GET]", error);
+    return NextResponse.json(
+      {
+        error: "Erreur serveur",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(req: Request, context: any) {
-  const { params } = await context;
+  const { params } = context;
   const id = parseInt(params.id, 10);
 
   const prisma = getPrismaClient();

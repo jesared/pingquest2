@@ -53,6 +53,7 @@ import { toast } from "sonner";
 const EditTournoi = () => {
   const params = useParams();
   const tournoiId = Number(params.id);
+
   const [openStartDatePopover, setOpenStartDatePopover] = useState(false);
   const [openEndDatePopover, setOpenEndDatePopover] = useState(false);
   const [openPopover, setOpenPopover] = useState(false);
@@ -379,17 +380,6 @@ const EditTournoi = () => {
                           </SelectContent>
                         </Select>
 
-                        {/* <Input
-                          className="placeholder:text-gray-400 "
-                          placeholder="Ex : Samedi"
-                          value={newEpreuve.jour}
-                          onChange={(e) =>
-                            setNewEpreuve({
-                              ...newEpreuve,
-                              jour: e.target.value,
-                            })
-                          }
-                        /> */}
                         <Label>Heure</Label>
                         <Input
                           className="placeholder:text-gray-400 "
@@ -486,7 +476,7 @@ const EditTournoi = () => {
                           <TableRow>
                             <TableHead>Nom & Catégorie</TableHead>
                             <TableHead>Jour / Heure</TableHead>
-                            <TableHead>Classement</TableHead>
+
                             <TableHead className="text-right">
                               Tarif anticipé
                             </TableHead>
@@ -507,12 +497,7 @@ const EditTournoi = () => {
                               <TableCell>
                                 {e.jour} à {e.heure}
                               </TableCell>
-                              <TableCell>
-                                {Number(e.minPoints) === 0
-                                  ? "NC"
-                                  : `≥ ${e.minPoints} pts`}
-                                {e.maxPoints && ` ≤ ${e.maxPoints} pts`}
-                              </TableCell>
+
                               <TableCell className="text-right text-primary font-medium">
                                 {!e.tarif || parseFloat(e.tarif) === 0
                                   ? "Gratuit"

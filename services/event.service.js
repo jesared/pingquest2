@@ -3,9 +3,11 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function insertEvents() {
+  const tournoiId = 1;
+
   const eventsData = [
     {
-      nom: "Tournoi 19 Avril 11h Tableau A",
+      nom: "A",
       date: new Date("2025-04-19T11:00:00.000Z"),
       jour: "samedi",
       heure: "11h",
@@ -15,9 +17,10 @@ async function insertEvents() {
       maxPoints: 1399,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 19 Avril 12h Tableau C",
+      nom: "C",
       date: new Date("2025-04-19T12:00:00.000Z"),
       jour: "samedi",
       heure: "12h",
@@ -27,9 +30,10 @@ async function insertEvents() {
       maxPoints: 799,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 19 Avril 13h Tableau D",
+      nom: "D",
       date: new Date("2025-04-19T13:00:00.000Z"),
       jour: "samedi",
       heure: "13h",
@@ -39,9 +43,10 @@ async function insertEvents() {
       maxPoints: 1699,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 19 Avril 14h Tableau B",
+      nom: "B",
       date: new Date("2025-04-19T14:00:00.000Z"),
       jour: "samedi",
       heure: "14h",
@@ -51,9 +56,10 @@ async function insertEvents() {
       maxPoints: 1099,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 20 Avril 8h30 Tableau F",
+      nom: "F",
       date: new Date("2025-04-20T08:30:00.000Z"),
       jour: "dimanche",
       heure: "8h30",
@@ -63,9 +69,10 @@ async function insertEvents() {
       maxPoints: 1199,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 20 Avril 9h30 Tableau H",
+      nom: "H",
       date: new Date("2025-04-20T09:30:00.000Z"),
       jour: "dimanche",
       heure: "9h30",
@@ -75,9 +82,10 @@ async function insertEvents() {
       maxPoints: 1799,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 20 Avril 11h Tableau E",
+      nom: "E",
       date: new Date("2025-04-20T11:00:00.000Z"),
       jour: "dimanche",
       heure: "11h",
@@ -87,9 +95,10 @@ async function insertEvents() {
       maxPoints: 899,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 20 Avril 12h Tableau G",
+      nom: "G",
       date: new Date("2025-04-20T12:00:00.000Z"),
       jour: "dimanche",
       heure: "12h",
@@ -99,9 +108,10 @@ async function insertEvents() {
       maxPoints: 1499,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 20 Avril 13h15 Tableau I",
+      nom: "I",
       date: new Date("2025-04-20T13:15:00.000Z"),
       jour: "dimanche",
       heure: "13h15",
@@ -111,21 +121,23 @@ async function insertEvents() {
       maxPoints: 2500,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 20 Avril 14h30 Tableau J",
+      nom: "J",
       date: new Date("2025-04-20T14:30:00.000Z"),
       jour: "dimanche",
       heure: "14h30",
       tableau: "J",
       categorie: "Dames TC",
-      minPoints: null,
-      maxPoints: null,
+      minPoints: 0,
+      maxPoints: 3000,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 21 Avril 8h30 Tableau L",
+      nom: "L",
       date: new Date("2025-04-21T08:30:00.000Z"),
       jour: "lundi",
       heure: "8h30",
@@ -135,9 +147,10 @@ async function insertEvents() {
       maxPoints: 1299,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 21 Avril 9h30 Tableau N",
+      nom: "N",
       date: new Date("2025-04-21T09:30:00.000Z"),
       jour: "lundi",
       heure: "9h30",
@@ -147,9 +160,10 @@ async function insertEvents() {
       maxPoints: 2099,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 21 Avril 11h Tableau K",
+      nom: "K",
       date: new Date("2025-04-21T11:00:00.000Z"),
       jour: "lundi",
       heure: "11h",
@@ -159,9 +173,10 @@ async function insertEvents() {
       maxPoints: 999,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 21 Avril 12h Tableau M",
+      nom: "M",
       date: new Date("2025-04-21T12:00:00.000Z"),
       jour: "lundi",
       heure: "12h",
@@ -171,9 +186,10 @@ async function insertEvents() {
       maxPoints: 1599,
       prixAnticipe: 8.0,
       prixSurPlace: 9.0,
+      tournoiId,
     },
     {
-      nom: "Tournoi 21 Avril 13h15 Tableau P",
+      nom: "P",
       date: new Date("2025-04-21T13:15:00.000Z"),
       jour: "lundi",
       heure: "13h15",
@@ -183,6 +199,7 @@ async function insertEvents() {
       maxPoints: 9999,
       prixAnticipe: 10.0,
       prixSurPlace: 11.0,
+      tournoiId,
     },
   ];
 

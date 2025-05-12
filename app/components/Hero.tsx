@@ -70,7 +70,7 @@ export const Hero = () => {
               êtes au bon endroit !
             </h1>
 
-            <p className="text-primary/60 py-4">
+            <div className="text-primary/60 py-4">
               L&apos;aventure ultime du tennis de table : inscrivez-vous, défiez
               vos limites, et vivez l&apos;expérience !{" "}
               <div className="flex justify-center">
@@ -85,7 +85,7 @@ export const Hero = () => {
                 </span>
                 avec PingQuest, le frisson de la compétition à portée de clic.
               </div>
-            </p>
+            </div>
           </div>
         </div>
         <canvas
