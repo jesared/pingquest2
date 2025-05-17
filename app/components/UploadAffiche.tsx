@@ -144,7 +144,7 @@ export default function UploadAffiche({
           <Button
             type="button"
             onClick={handleDelete}
-            className="absolute top-2 right-2 bg-white/90 hover:bg-red-600 text-red-600 hover:text-white rounded-full p-1 shadow transition"
+            className="cursor-pointer absolute top-2 right-2  bg-white/80 hover:bg-red-500 text-red-600 hover:text-white rounded-full shadow transition-colors"
             title="Supprimer l’aperçu"
             size="icon"
           >
@@ -166,9 +166,9 @@ export default function UploadAffiche({
             type="button"
             variant={"destructive"}
             onClick={handleDelete}
-            className="cursor-pointer absolute top-2 right-2 rounded-full p-1 shadow transition"
+            className="cursor-pointer absolute top-2 right-2  bg-white/80 hover:bg-red-500 text-red-600 hover:text-white rounded-full shadow transition-colors"
             title="Supprimer"
-            size="icon"
+            size={"icon"}
           >
             <X className="h-4 w-4" />
           </Button>

@@ -479,7 +479,7 @@ export default function MakeTournoi() {
                 </div>
                 <div className="flex-1 bg-gray-50 rounded-lg shadow-lg border p-6 flex flex-col items-center hover:bg-gray-100 transition">
                   <div className="flex items-center gap-2 mb-3">
-                    <FileText className="text-green-600" />
+                    <FileText />
                     <span className="font-bold text-md">
                       Règlement du tournoi
                     </span>

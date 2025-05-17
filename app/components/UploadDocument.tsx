@@ -132,11 +132,11 @@ export default function UploadDocument({
             <span className="truncate max-w-[200px]">{previewName}</span>
             <Button
               type="button"
-              size="icon"
               variant={"destructive"}
               onClick={handleDelete}
-              className="ml-2 bg-white/80 hover:bg-red-500 text-red-600 hover:text-white rounded-full p-1 shadow transition-colors cursor-pointer"
+              className=" cursor-pointer ml-2 bg-white/80 hover:bg-red-500 text-red-600 hover:text-white rounded-full p-1 shadow transition-colors"
               title="Supprimer"
+              size={"icon"}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -157,10 +157,10 @@ export default function UploadDocument({
             </Link>
             <Button
               type="button"
-              size="icon"
               onClick={handleDelete}
-              className="ml-2 bg-white/80 hover:bg-red-500 text-red-600 hover:text-white rounded-full p-1 shadow transition-colors"
+              className=" cursor-pointer ml-2 bg-white/80 hover:bg-red-500 text-red-600 hover:text-white rounded-full p-1 shadow transition-colors"
               title="Supprimer"
+              size={"icon"}
             >
               <X className="h-4 w-4" />
             </Button>
