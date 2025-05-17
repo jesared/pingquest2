@@ -1,11 +1,5 @@
 import { getPrismaClient } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-
-// Schéma de validation pour l'ID
-const paramsSchema = z.object({
-  id: z.string().transform((val) => parseInt(val, 10)),
-});
 
 export async function GET(
   req: NextRequest,
@@ -14,16 +8,11 @@ export async function GET(
   try {
     // Validation des paramètres
     const { id } = await context.params;
-    const result = paramsSchema.safeParse(id);
-
-    if (!result.success) {
-      return NextResponse.json({ error: "ID invalide" }, { status: 400 });
-    }
 
     const prisma = getPrismaClient();
 
     const tournoi = await prisma.tournoi.findUnique({
-      where: { id: Number(id) },
+      where: { id: parseInt(id) },
       include: {
         events: {
           orderBy: {
