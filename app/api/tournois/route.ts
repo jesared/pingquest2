@@ -44,6 +44,7 @@ export async function POST(req: Request) {
         nom: body.nom,
         lieu: body.lieu,
         afficheUrl: body.afficheUrl,
+        reglementUrl: body.reglementUrl,
         description: body.description,
         responsableNom: body.responsableNom,
         responsableEmail: body.email,
@@ -68,13 +69,6 @@ export async function POST(req: Request) {
               heure: string;
               tarif: string;
             }) => {
-              // const dateJour = new Date(epreuve.jour); // Transformation de 'jour' en Date
-              // const dateJourString = dateJour.toISOString().split("T")[0];
-              // // Validation de la date de l'épreuve
-              // if (isNaN(dateJour.getTime())) {
-              //   throw new Error("Valeur de jour d'épreuve invalide");
-              // }
-
               return {
                 nom: epreuve.nom,
                 tableau: epreuve.nom,

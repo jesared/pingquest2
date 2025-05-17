@@ -1,20 +1,21 @@
 // components/UploadAffiche.tsx
 "use client";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { deleteSupabaseFile } from "@/lib/deleteSupabaseFile";
 import { useAuth } from "@clerk/nextjs";
 import { createClient } from "@supabase/supabase-js";
-import { X } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
-
+import { toast } from "sonner";
 // Crée une instance Supabase SANS authentification globale
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
+const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 export default function UploadAffiche({
   onUpload,
 }: {
@@ -24,17 +25,34 @@ export default function UploadAffiche({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  // ici file est une variable, et File est un type natif JS/TS
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const [filePath, setFilePath] = useState<string | null>(null);
+  const [url, setUrl] = useState<string>("");
+  const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setFile(file);
-    // Génére une URL temporaire pour preview
-    const url = URL.createObjectURL(file);
-    setPreview(url);
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      alert(
+        "Format non supporté. Merci de choisir une image JPG, PNG ou WEBP."
+      );
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setErrorMsg("Le fichier dépasse la taille maximale autorisée (2 Mo).");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    setPreview(URL.createObjectURL(file));
+    setUrl("");
+    setErrorMsg(null);
   };
+
   const handleUpload = async () => {
     // 1. Récupère le JWT Clerk
     const token = await getToken({ template: "supabase" });
@@ -48,87 +66,151 @@ export default function UploadAffiche({
     );
 
     const file = fileInputRef.current?.files?.[0];
-
     if (!file) return;
-    setUploading(true);
 
+    setUploading(true);
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const filePath = `affiche/${Date.now()}_${sanitizedFileName}`;
-
     const { error } = await authedSupabase.storage
       .from("affiche")
       .upload(filePath, file);
 
     if (error) {
-      alert("Erreur lors de l'upload !" + error.message);
+      toast.error("Erreur lors de l'upload !" + error.message);
     } else {
       const { data: publicUrlData } = supabase.storage
         .from("affiche")
         .getPublicUrl(filePath);
       onUpload(publicUrlData.publicUrl);
-      setPreview(null); // Optionnel : enlever la preview après upload
+      setUrl(publicUrlData.publicUrl);
+
+      setFilePath(filePath);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setPreview(null);
     }
     setUploading(false);
   };
-  // Reset preview et valeur du champ input
-  const handleReset = () => {
+  // --- SUPPRESSION ---
+  const handleDelete = async () => {
+    console.log("filePath", filePath);
+    if (filePath) {
+      await deleteSupabaseFile("affiche", filePath);
+      toast.success("Affiche supprimée !");
+    }
     setPreview(null);
-    setFile(null);
+    setUrl("");
+    setFilePath(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    onUpload(""); // Réinitialise aussi dans le parent si besoin
+    onUpload(""); // Reset dans le parent
   };
+  console.log("preview:", preview, "url:", url);
   return (
-    <div>
-      <div className="justify-between space-x-2">
-        <Input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          onChange={handleFileChange}
-        />
-        <Button
-          size={"sm"}
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-        >
-          {uploading ? "Upload en cours..." : "Choisir une affiche"}
-        </Button>
-        {file && (
-          <Button
-            size={"sm"}
-            variant={"secondary"}
-            type="button"
-            onClick={handleUpload}
-            disabled={uploading}
-          >
-            {uploading ? "Envoi en cours..." : "Uploader"}
-          </Button>
-        )}
-      </div>
-
+    <div className="flex flex-col gap-3 items-start w-full">
+      {/* Choix fichier */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
+      <Button
+        type="button"
+        size={"sm"}
+        variant={"secondary"}
+        onClick={() => fileInputRef.current?.click()}
+        disabled={uploading || (!!url && !preview)}
+        className="px-4 py-2 rounded hover:scale-105 transition cursor-pointer"
+      >
+        {uploading ? "Upload en cours..." : "Choisir une affiche"}
+      </Button>
+      {errorMsg && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{errorMsg}</AlertDescription>
+        </Alert>
+      )}
       {/* Preview */}
-      {preview && (
-        <div className="relative mt-2 inline-block">
+      {preview && !url && (
+        <div className="relative mt-4 inline-block">
           <Image
             width={200}
-            height={400}
+            height={300}
             src={preview}
             alt="Aperçu affiche"
-            // className="max-w-xs max-h-40 rounded shadow border mb-2"
+            className="rounded-lg shadow-md border-2 border-primary hover:scale-105 hover:shadow-xl transition"
           />
           <Button
-            size={"icon"}
-            variant={"destructive"}
             type="button"
-            onClick={handleReset}
-            className="absolute top-1 right-1 rounded-full"
+            onClick={handleDelete}
+            className="absolute top-2 right-2 bg-white/90 hover:bg-red-600 text-red-600 hover:text-white rounded-full p-1 shadow transition"
             title="Supprimer l’aperçu"
+            size="icon"
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
+      )}
+      {/* Affichage image déjà uploadée */}
+      {url && !preview && (
+        <div className="relative mt-4 inline-block">
+          <Image
+            width={200}
+            height={300}
+            src={url}
+            alt="Affiche uploadée"
+            className="rounded-lg shadow-md border-2 border-primary hover:scale-105 hover:shadow-xl transition"
+          />
+          <Button
+            type="button"
+            variant={"destructive"}
+            onClick={handleDelete}
+            className="cursor-pointer absolute top-2 right-2 rounded-full p-1 shadow transition"
+            title="Supprimer"
+            size="icon"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Bouton d’upload */}
+      {preview && !url && (
+        <Button
+          type="button"
+          size={"sm"}
+          className="cursor-pointer "
+          onClick={handleUpload}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <>
+              <svg
+                className="animate-spin h-5 w-5 mr-2 inline"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              Envoi en cours...
+            </>
+          ) : (
+            "Uploader"
+          )}
+        </Button>
       )}
     </div>
   );

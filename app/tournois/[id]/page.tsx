@@ -84,11 +84,13 @@ export default async function Page({
                   Je m’inscris !
                 </Button>
               </Link>
-              <Link href={`/tournois/${tournoi.id}/reglement`}>
-                <Button variant="secondary" className="ml-4 cursor-pointer">
-                  Voir le règlement
-                </Button>
-              </Link>
+              {tournoi.reglementUrl && (
+                <Link href={`${tournoi.reglementUrl}`} target="_blank">
+                  <Button variant="secondary" className="ml-4 cursor-pointer">
+                    Voir le règlement
+                  </Button>
+                </Link>
+              )}
             </div>
             {canEdit && (
               <div className="flex justify-end">

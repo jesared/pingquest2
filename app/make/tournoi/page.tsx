@@ -4,6 +4,7 @@ import DateRangeDisplay from "@/app/components/DateRangeDisplay";
 import { DeleteDialog } from "@/app/components/DeleteDialog";
 import GenererJoursTournoi from "@/app/components/GenererJoursTournoi";
 import UploadAffiche from "@/app/components/UploadAffiche";
+import UploadDocument from "@/app/components/UploadDocument";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -47,8 +48,14 @@ import { useDeleteDialog } from "@/hooks/useDeleteDialog";
 import { useUser } from "@clerk/nextjs";
 import confetti from "canvas-confetti";
 import { format } from "date-fns";
-import { CalendarIcon, MoreVertical, Plus, Trash } from "lucide-react";
-import Image from "next/image";
+import {
+  CalendarIcon,
+  FileImage,
+  FileText,
+  MoreVertical,
+  Plus,
+  Trash,
+} from "lucide-react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -93,6 +100,7 @@ export default function MakeTournoi() {
   const [responsableNom, setResponsableNom] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
+  const [reglementUrl, setReglementUrl] = useState("");
   const [afficheUrl, setAfficheUrl] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,6 +142,7 @@ export default function MakeTournoi() {
       email,
       telephone,
       afficheUrl,
+      reglementUrl,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       epreuves,
@@ -456,28 +465,27 @@ export default function MakeTournoi() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <Label htmlFor="afficheUrl">Affiche du tournoi</Label>
-                <UploadAffiche onUpload={(url) => setAfficheUrl(url)} />
-                {afficheUrl && (
-                  <Image
-                    width={200}
-                    height={400}
-                    src={afficheUrl}
-                    alt="Affiche enregistrée"
-                    className="max-w-xs mt-2"
-                  />
-                )}
-              </div>
-              <div className="space-y-4">
-                <Label htmlFor="reglementUrl">Règlement du tournoi (PDF)</Label>
-                <Input
-                  className="placeholder:text-gray-400 mt-2 "
-                  id="reglementUrl"
-                  name="reglementUrl"
-                  type="url"
-                  placeholder="Url du reglement"
-                />
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-1 bg-gray-50 rounded-lg shadow-lg border p-6 flex flex-col items-center hover:bg-gray-100 transition">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Label htmlFor="afficheUrl">
+                      <FileImage />
+                      <span className="font-bold text-md">
+                        Affiche du tournoi
+                      </span>
+                    </Label>
+                  </div>
+                  <UploadAffiche onUpload={(url) => setAfficheUrl(url)} />
+                </div>
+                <div className="flex-1 bg-gray-50 rounded-lg shadow-lg border p-6 flex flex-col items-center hover:bg-gray-100 transition">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileText className="text-green-600" />
+                    <span className="font-bold text-md">
+                      Règlement du tournoi
+                    </span>
+                  </div>
+                  <UploadDocument onUpload={setReglementUrl} />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -554,17 +562,6 @@ export default function MakeTournoi() {
                       </SelectContent>
                     </Select>
 
-                    {/* <Input
-                          className="placeholder:text-gray-400 "
-                          placeholder="Ex : Samedi"
-                          value={newEpreuve.jour}
-                          onChange={(e) =>
-                            setNewEpreuve({
-                              ...newEpreuve,
-                              jour: e.target.value,
-                            })
-                          }
-                        /> */}
                     <Label>Heure</Label>
                     <Input
                       className="placeholder:text-gray-400 "
