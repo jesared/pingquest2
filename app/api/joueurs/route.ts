@@ -104,7 +104,16 @@ export async function GET() {
       include: {
         engagement: {
           include: {
-            event: true,
+            event: {
+              select: {
+                id: true,
+                tableau: true,
+                tournoi: {
+                  // 👈 ajoute ceci !
+                  select: { id: true, nom: true },
+                },
+              },
+            },
           },
         },
       },

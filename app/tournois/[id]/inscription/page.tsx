@@ -5,13 +5,12 @@ import { getPrismaClient } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-// interface InscriptionProps {
-//   searchParams?: { [key: string]: string | string[] | undefined };
-//   tournoiId?: string | string[]; // Add tournoiId property
-// }
+type PageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
-export default async function Page(props: any) {
-  const { searchParams } = props;
+export default async function Page(props: PageProps) {
+  const searchParams = await props.searchParams;
   const tournoiId = Number(searchParams?.tournoiId);
 
   const { userId } = await auth();

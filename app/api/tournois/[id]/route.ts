@@ -7,22 +7,14 @@ const paramsSchema = z.object({
   id: z.string().transform((val) => parseInt(val, 10)),
 });
 
-// Type pour le context
-type Context = {
-  params: {
-    id: string;
-  };
-};
-
 export async function GET(
   req: NextRequest,
-  context: any /* or RouteContext */
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Validation des paramètres
-    const params = await context.params;
-    const { id } = params;
-    const result = paramsSchema.safeParse(params);
+    const { id } = await context.params;
+    const result = paramsSchema.safeParse(id);
 
     if (!result.success) {
       return NextResponse.json({ error: "ID invalide" }, { status: 400 });
@@ -68,9 +60,11 @@ export async function GET(
   }
 }
 
-export async function PUT(req: Request, context: any) {
-  const { params } = context;
-  const id = parseInt(params.id, 10);
+export async function PUT(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
 
   const prisma = getPrismaClient();
 
@@ -93,7 +87,7 @@ export async function PUT(req: Request, context: any) {
     } = body;
 
     // Construction dynamique des champs à mettre à jour
-    const dataToUpdate: any = {};
+    const dataToUpdate: Record<string, unknown> = {};
     if (nom !== undefined) dataToUpdate.nom = nom;
     if (lieu !== undefined) dataToUpdate.lieu = lieu;
     if (description !== undefined) dataToUpdate.description = description;
@@ -109,7 +103,7 @@ export async function PUT(req: Request, context: any) {
     if (endDate !== undefined) dataToUpdate.fin = new Date(endDate);
 
     const updatedTournoi = await prisma.tournoi.update({
-      where: { id },
+      where: { id: Number(id) },
       data: dataToUpdate,
     });
 
@@ -152,7 +146,7 @@ export async function PUT(req: Request, context: any) {
               prixAnticipe: epreuve.prixAnticipe ?? 8,
               prixSurPlace: epreuve.prixSurPlace ?? 8,
               date: new Date(), // ou epreuve.date ?
-              tournoi: { connect: { id } },
+              tournoi: { connect: { id: Number(id) } },
             },
           });
         }

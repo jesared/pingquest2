@@ -15,7 +15,7 @@ export async function GET(req: Request) {
       { status: 400 }
     );
   }
-  console.log("tournoiId", tournoiId);
+
   try {
     const epreuves = await prisma.event.findMany({
       where: {

@@ -83,18 +83,18 @@ export default function RoleTournoiButton() {
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <Link
-          href="/dashboard/tournois"
-          title="Vos tournois"
-          className="flex items-center space-x-2"
+        <SidebarMenuButton
+          className={isDashboardTournois ? "bg-primary text-white" : ""}
         >
-          <SidebarMenuButton
-            className={isDashboardTournois ? "bg-primary text-white" : ""}
+          <Link
+            href="/dashboard/tournois"
+            title="Vos tournois"
+            className="flex items-center space-x-2"
           >
             <Award size={18} className="shrink-0" />
             <span className="text-[16px]">Mes tournois</span>
-          </SidebarMenuButton>
-        </Link>
+          </Link>{" "}
+        </SidebarMenuButton>
       </SidebarMenuItem>
     </>
   );

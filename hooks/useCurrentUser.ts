@@ -13,9 +13,11 @@ export function useCurrentUser() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({}),
+          credentials: "include",
         });
 
         const data = await res.json();
+
         if (res.ok && data?.id) {
           setCurrentUserId(data.id);
         }

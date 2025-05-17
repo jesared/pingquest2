@@ -48,15 +48,15 @@ export function AppSidebar() {
     <Sidebar collapsible="offcanvas">
       <SidebarContent>
         <div className="p-2 flex justify-end"></div>
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center py-4">
           <Trophy className="w-8 h-8 font-light" strokeWidth={1} />
           <h4 className="ml-2 scroll-m-20 text-3xl font-extralight  tracking-tight">
-            <span className="text-primary font-semibold">P</span>ing
-            <span className="text-accent font-bold">Q</span>uest
+            <span className="text-primary text-4xl font-bold">P</span>ing
+            <span className="text-secondary text-4xl font-bold">Q</span>uest
           </h4>
         </div>
 
-        <SidebarGroup>
+        <SidebarGroup className="space-y-3">
           <SidebarGroupContent>
             <SidebarMenu>
               {items
@@ -102,7 +102,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarSeparator className="p-0 m-0" />
-        <div className="mt-auto p-2">
+        <div className="mt-auto">
           <SidebarSeparator className="p-0 mx-0 my-3" />
           <SidebarMenu>
             <SidebarMenuItem>

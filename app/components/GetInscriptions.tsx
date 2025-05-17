@@ -9,8 +9,12 @@ import CardPlayer from "./CardPlayer";
 interface Engagement {
   id: string;
   event: {
-    tableau: string;
     id: string;
+    tableau: string;
+    tournoi: {
+      id: number;
+      nom: string;
+    };
   };
 }
 

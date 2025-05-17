@@ -1,6 +1,60 @@
 import { getPrismaClient } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+export async function POST(req: Request) {
+  const prisma = getPrismaClient();
+  const body = await req.json();
+  const {
+    nom,
+    jour,
+    heure,
+    tableau,
+    categorie,
+    minPoints,
+    maxPoints,
+    prixAnticipe,
+    prixSurPlace,
+    tournoiId,
+    // etat, // facultatif
+  } = body;
+
+  if (
+    nom === undefined ||
+    nom === "" ||
+    jour === undefined ||
+    jour === "" ||
+    heure === undefined ||
+    heure === "" ||
+    prixAnticipe === undefined ||
+    prixSurPlace === undefined ||
+    tournoiId === undefined
+  ) {
+    return NextResponse.json(
+      { error: "Champs obligatoires manquants." },
+      { status: 400 }
+    );
+  }
+
+  const created = await prisma.event.create({
+    data: {
+      nom,
+      date: new Date(),
+      jour,
+      heure,
+      tableau: tableau || nom,
+      categorie: categorie || null,
+      minPoints: minPoints ? Number(minPoints) : null,
+      maxPoints: maxPoints ? Number(maxPoints) : null,
+      prixAnticipe: Number(prixAnticipe),
+      prixSurPlace: Number(prixSurPlace),
+
+      tournoiId: Number(tournoiId),
+      // etat, // facultatif
+    },
+  });
+
+  return NextResponse.json(created);
+}
 export async function GET(req: Request) {
   const prisma = getPrismaClient();
 

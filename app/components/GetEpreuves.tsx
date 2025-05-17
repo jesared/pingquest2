@@ -3,20 +3,18 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Link from "next/link";
 
 // Fonction pour récupérer les épreuves depuis ton API
 async function fetchEpreuves(tournoiId: number) {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_SITE_URL}/api/epreuves?tournoiId=${tournoiId}`,
     {
-      next: { revalidate: 60 }, // Cache pendant 60 secondes
+      cache: "no-store", // ✅ Ne jamais utiliser de cache
     }
   );
   if (!response.ok) {
@@ -46,35 +44,43 @@ const GetEpreuves = async ({ tournoiId }: GetEpreuvesProps) => {
     console.error("Erreur lors de la récupération des épreuves:", error);
   }
   return (
-    <Table>
-      <TableCaption>
-        <Link href="#" title="Pdf du réglement">
-          Pdf règlement du tournoi
-        </Link>
-      </TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Jour</TableHead>
-          <TableHead>Heure</TableHead>
-          <TableHead>Tableau</TableHead>
-          <TableHead>Catégorie</TableHead>
-          <TableHead>Prix anticipé</TableHead>
-          <TableHead>Prix sur place</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {epreuves.map((epreuve) => (
-          <TableRow key={epreuve.id}>
-            <TableCell>{epreuve.jour}</TableCell>
-            <TableCell>{epreuve.heure}</TableCell>
-            <TableCell>{epreuve.tableau}</TableCell>
-            <TableCell>{epreuve.categorie}</TableCell>
-            <TableCell>{epreuve.prixAnticipe} €</TableCell>
-            <TableCell>{epreuve.prixSurPlace} €</TableCell>
+    <section className="mb-8">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+        Les épreuves :
+      </h2>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Jour</TableHead>
+            <TableHead>Heure</TableHead>
+            <TableHead>Tableau</TableHead>
+            <TableHead>Catégorie</TableHead>
+            <TableHead>Prix anticipé</TableHead>
+            <TableHead>Prix sur place</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {epreuves.map((epreuve) => (
+            <TableRow key={epreuve.id}>
+              <TableCell>{epreuve.jour}</TableCell>
+              <TableCell>{epreuve.heure}</TableCell>
+              <TableCell>{epreuve.tableau}</TableCell>
+              <TableCell>{epreuve.categorie}</TableCell>
+              <TableCell>
+                {epreuve.prixAnticipe === 0
+                  ? "Gratuit"
+                  : `${epreuve.prixAnticipe.toFixed(2)} €`}
+              </TableCell>
+              <TableCell>
+                {epreuve.prixSurPlace === 0
+                  ? "Gratuit"
+                  : `${epreuve.prixSurPlace.toFixed(2)} €`}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </section>
   );
 };
 

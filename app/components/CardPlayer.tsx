@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
+import { Separator } from "@/components/ui/separator";
 import { PopoverCard } from "./PoppoverCard";
 
 interface Joueur {
@@ -46,7 +47,7 @@ export default function CardPlayer({
     }
   };
   return (
-    <Card className="w-full max-w-xs hover:bg-muted transition-all duration-300 hover:shadow-xl hover:scale-[1.002] rounded-xl py-2">
+    <Card className="w-full max-w-xs hover:bg-muted transition-all duration-300 hover:shadow-xl hover:scale-[1.02] rounded-xl py-2">
       <CardContent className="flex flex-col items-center gap-2 p-4 relative">
         {isOwner && (
           <PopoverCard joueur={joueur} onDelete={handleSupprimerJoueur} />
@@ -67,7 +68,9 @@ export default function CardPlayer({
           <p className="text-sm font-semibold">
             {joueur.prenom} {joueur.nom}
           </p>
-          <p className="text-[10px] text-gray-400">{joueur.club}</p>
+          <p className="text-[11px] text-secondary font-semibold">
+            {joueur.club}
+          </p>
         </div>
         {joueur.engagement.length > 0 ? (
           <div className="space-y-2">
@@ -76,7 +79,7 @@ export default function CardPlayer({
                 <Badge
                   key={eng.id}
                   variant="outline"
-                  className="text-xs px-2 py-1 rounded-full"
+                  className="text-xs px-2 py-1"
                 >
                   {eng.event.tableau}
                 </Badge>
@@ -87,15 +90,20 @@ export default function CardPlayer({
           <p className="text-sm text-muted-foreground">Aucun engagement</p>
         )}
         {/* Points + Licence alignés à droite */}
-        <div className="w-full flex justify-end text-right">
+        <Separator />
+        <div className="w-full flex">
           <div className="flex flex-col items-end text-xs text-gray-500 gap-1">
-            <Badge
-              variant={"outline"}
-              className="text-primary font-bold text-sm"
-            >
-              #{joueur.pointsOfficiel ?? "--"}
-            </Badge>
-            <span>Licence: {joueur.numeroLicence ?? "N/A"}</span>
+            <div className="justify-center space-x-2">
+              <Badge
+                variant={"outline"}
+                className="text-primary font-bold text-sm"
+              >
+                #{joueur.pointsOfficiel ?? "--"}
+              </Badge>
+              <Badge className="font-bold text-sm">
+                {joueur.numeroLicence ?? "N/A"}
+              </Badge>
+            </div>
           </div>
         </div>
       </CardContent>

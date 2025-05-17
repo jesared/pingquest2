@@ -38,7 +38,7 @@ export default function ListTournois({
       <div className="text-center mb-4">
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
         {tournois.map((tournoi) => (
           <Card
             key={tournoi.id}
@@ -52,7 +52,7 @@ export default function ListTournois({
             </CardHeader>
             <CardContent className="flex-1">
               <CardDescription>
-                <Badge variant={"secondary"} className="text-sm text-gray-500">
+                <Badge variant={"outline"} className="text-sm text-gray-500">
                   {new Date(tournoi.startDate).toLocaleDateString("fr-FR")}
                   {new Date(tournoi.startDate).toDateString() ===
                   new Date(tournoi.endDate).toDateString()
@@ -66,21 +66,16 @@ export default function ListTournois({
             <CardFooter>
               <div className="mt-auto flex space-x-2">
                 <Link href={`/tournois/${tournoi.id}`}>
-                  <Button
-                    variant={"secondary"}
-                    size={"icon"}
-                    className="rounded-full cursor-pointer"
-                  >
+                  <Button variant={"secondary"} className=" cursor-pointer">
                     <Binoculars />
+                    Voir
                   </Button>
                 </Link>
                 {userTournoi === tournoi.userId && (
                   <Link href={`/tournois/${tournoi.id}/edit`}>
-                    <Button
-                      size={"icon"}
-                      className="rounded-full cursor-pointer"
-                    >
+                    <Button className="cursor-pointer">
                       <EditIcon />
+                      je modifie !
                     </Button>
                   </Link>
                 )}
