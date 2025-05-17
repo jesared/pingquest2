@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       data: {
         nom: body.nom,
         lieu: body.lieu,
-        afficheUrl: body.affiche,
+        afficheUrl: body.afficheUrl,
         description: body.description,
         responsableNom: body.responsableNom,
         responsableEmail: body.email,

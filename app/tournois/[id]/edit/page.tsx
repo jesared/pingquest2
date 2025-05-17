@@ -107,7 +107,7 @@ const EditTournoi = () => {
 
   return (
     <div className="@max-xs:w-full max-w-3xl mx-auto py-10 px-4">
-      <div className="flex justify-between  mb-2">
+      <div className="flex justify-between  mb-6">
         <h1 className="text-2xl font-bold">Modifier votre tournoi</h1>
         <div className="justify-end flex space-x-2">
           {(formValues.id ?? tournoiId) && (
@@ -119,7 +119,7 @@ const EditTournoi = () => {
             />
           )}
           <Link href={`/tournois/${tournoiId}`}>
-            <Button variant={"ghost"} className="rounded-full cursor-pointer">
+            <Button variant={"ghost"} className="cursor-pointer">
               <Binoculars />
               Voir votre tournoi
             </Button>
@@ -148,8 +148,8 @@ const EditTournoi = () => {
                 visé, cadre...).
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
                 <Label htmlFor="nom">Nom du tournoi</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -159,7 +159,7 @@ const EditTournoi = () => {
                   onChange={(e) => updateField("nom", e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="lieu">Lieu</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -169,7 +169,7 @@ const EditTournoi = () => {
                   onChange={(e) => updateField("lieu", e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   className="placeholder:text-gray-400 mt-2 "
@@ -194,7 +194,7 @@ const EditTournoi = () => {
                 postérieure à la date de début.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div>
                 <div className="mt-1">
                   <DateRangeDisplay
@@ -205,7 +205,7 @@ const EditTournoi = () => {
               </div>
 
               {/* Date de début */}
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="startDate">Date de début</Label>
                 <Popover
                   open={openStartDatePopover}
@@ -249,7 +249,7 @@ const EditTournoi = () => {
               </div>
 
               {/* Date de fin */}
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="endDate">Date de fin</Label>
                 <Popover
                   open={openEndDatePopover}
@@ -302,8 +302,8 @@ const EditTournoi = () => {
                 l&apos;organisation.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
                 <Label htmlFor="responsableNom">Nom du responsable</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -316,7 +316,7 @@ const EditTournoi = () => {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="email">Adresse email</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -328,7 +328,7 @@ const EditTournoi = () => {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="telephone">Téléphone</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -353,7 +353,7 @@ const EditTournoi = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="affiche">Affiche du tournoi</Label>
                 {formValues.afficheUrl ? (
                   <div className="rounded border p-2 w-fit">
@@ -377,7 +377,7 @@ const EditTournoi = () => {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="reglement">Règlement du tournoi (PDF)</Label>
                 {formValues.reglementUrl ? (
                   <a
@@ -415,18 +415,19 @@ const EditTournoi = () => {
                 anticipés et sur place.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-3">
               {/* Ajout d’une nouvelle épreuve */}
               <Popover open={openPopover} onOpenChange={setOpenPopover}>
                 <PopoverTrigger asChild>
-                  <Button size="icon" className="rounded-full cursor-pointer">
+                  <Button size={"sm"} className="cursor-pointer">
                     <Plus />
+                    Ajouter une épreuve
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  side="right"
+                  side="top"
                   sideOffset={20}
-                  className="w-[350px] space-y-4"
+                  className="w-[250px] space-y-4"
                 >
                   <h4 className="text-sm font-medium">Nouvelle épreuve</h4>
                   <div className="grid gap-2">
@@ -550,7 +551,7 @@ const EditTournoi = () => {
 
               {/* Tableau des épreuves existantes */}
               {epreuves.length > 0 && (
-                <div className="mt-4 border-t pt-4">
+                <div className=" pt-4">
                   <h4 className="font-medium text-sm text-muted-foreground mb-2">
                     Résumé des épreuves :
                   </h4>

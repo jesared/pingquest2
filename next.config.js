@@ -15,6 +15,11 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "qzovkrnlkeunrzsqfohl.supabase.co",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
         hostname: "tennis2table.com",
         pathname: "**",
       },

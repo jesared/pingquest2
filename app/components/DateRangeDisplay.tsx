@@ -20,9 +20,9 @@ export default function DateRangeDisplay({ startDate, endDate }: Props) {
     return (
       <div className="flex justify-center items-center gap-2">
         {startDate && (
-          <p className="text-sm text-muted-foreground mt-1">
-            <Badge className="text-md">{formatDateWithDay(startDate)}</Badge>
-          </p>
+          <Badge variant={"outline"} className="text-md">
+            {formatDateWithDay(startDate)}
+          </Badge>
         )}
         <span className="text-md">(sur la journée)</span>
       </div>
@@ -32,15 +32,15 @@ export default function DateRangeDisplay({ startDate, endDate }: Props) {
   return (
     <div className="flex justify-center items-center gap-2">
       {startDate && (
-        <p className="text-sm text-muted-foreground mt-1">
-          <Badge className="text-md">{formatDateWithDay(startDate)}</Badge>
-        </p>
+        <Badge variant={"outline"} className="text-md">
+          {formatDateWithDay(startDate)}
+        </Badge>
       )}
       {startDate && endDate && <span> au </span>}
       {endDate && (
-        <p className="text-sm text-muted-foreground mt-1">
-          <Badge className="text-md">{formatDateWithDay(endDate)}</Badge>
-        </p>
+        <Badge variant={"outline"} className="text-md">
+          {formatDateWithDay(endDate)}
+        </Badge>
       )}
     </div>
   );

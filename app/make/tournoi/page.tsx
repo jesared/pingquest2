@@ -3,6 +3,7 @@
 import DateRangeDisplay from "@/app/components/DateRangeDisplay";
 import { DeleteDialog } from "@/app/components/DeleteDialog";
 import GenererJoursTournoi from "@/app/components/GenererJoursTournoi";
+import UploadAffiche from "@/app/components/UploadAffiche";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -44,8 +45,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useDeleteDialog } from "@/hooks/useDeleteDialog";
 import { useUser } from "@clerk/nextjs";
+import confetti from "canvas-confetti";
 import { format } from "date-fns";
 import { CalendarIcon, MoreVertical, Plus, Trash } from "lucide-react";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -90,7 +93,7 @@ export default function MakeTournoi() {
   const [responsableNom, setResponsableNom] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
-  // const [affiche, setAffiche] = useState("");
+  const [afficheUrl, setAfficheUrl] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,6 +113,7 @@ export default function MakeTournoi() {
           ep.nom &&
           ep.jour &&
           ep.heure &&
+          ep.categorie &&
           ep.tarif !== undefined &&
           ep.tarif !== "" &&
           ep.tarifPlace !== undefined &&
@@ -129,6 +133,7 @@ export default function MakeTournoi() {
       responsableNom,
       email,
       telephone,
+      afficheUrl,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       epreuves,
@@ -144,7 +149,8 @@ export default function MakeTournoi() {
     if (res.ok) {
       const json = await res.json();
       toast.success("Tournoi créé !");
-      redirect("/tournois");
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+      redirect("/dashboard/tournois");
       console.log(json);
     } else {
       const errorData = await res.json();
@@ -162,6 +168,7 @@ export default function MakeTournoi() {
       newEpreuve.nom &&
       newEpreuve.jour &&
       newEpreuve.heure &&
+      newEpreuve.categorie &&
       newEpreuve.tarif !== undefined &&
       newEpreuve.tarif !== "" &&
       newEpreuve.tarifPlace !== undefined &&
@@ -205,6 +212,7 @@ export default function MakeTournoi() {
           e.nom?.trim() &&
           e.jour?.trim() &&
           e.heure?.trim() &&
+          e.categorie?.trim() &&
           e.tarif !== undefined &&
           e.tarif !== "" &&
           !isNaN(parseFloat(e.tarif)) &&
@@ -231,7 +239,7 @@ export default function MakeTournoi() {
         }}
       />
 
-      <div className="flex justify-between  mb-2">
+      <div className="flex justify-between  mb-6">
         <h1 className="text-2xl font-bold">Ajouter votre tournoi</h1>
       </div>
 
@@ -256,8 +264,8 @@ export default function MakeTournoi() {
                 visé, cadre...).
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
                 <Label htmlFor="nom">Nom du tournoi</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -268,7 +276,7 @@ export default function MakeTournoi() {
                   placeholder="Ex : Tournoi National de Printemps"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="lieu">Lieu</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -279,7 +287,7 @@ export default function MakeTournoi() {
                   placeholder="Ex : Salle Jean Moulin, Reims"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   className="placeholder:text-gray-400 mt-2 "
@@ -304,13 +312,13 @@ export default function MakeTournoi() {
                 postérieure à la date de début.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div>
                 <div className="mt-1">
                   <DateRangeDisplay startDate={startDate} endDate={endDate} />
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="startDate">Date de début</Label>
                 <Popover
                   open={openStartDatePopover}
@@ -349,7 +357,7 @@ export default function MakeTournoi() {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label htmlFor="endDate">Date de fin</Label>
                 <Popover
                   open={openEndDatePopover}
@@ -401,8 +409,8 @@ export default function MakeTournoi() {
                 l&apos;organisation.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
                 <Label>Nom de l&apos;organisateur</Label>
                 <Input
                   name="responsableNom"
@@ -413,7 +421,7 @@ export default function MakeTournoi() {
                   onChange={(e) => setResponsableNom(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label>Email</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -424,7 +432,7 @@ export default function MakeTournoi() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Label>Téléphone</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
@@ -447,22 +455,26 @@ export default function MakeTournoi() {
                 tournoi : une affiche officielle (image) et un règlement (PDF).
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="affiche">Affiche du tournoi</Label>
-                <Input
-                  placeholder="Adresse url de l'affiche"
-                  className="placeholder:text-gray-400 mt-2 "
-                  id="affiche"
-                  name="affiche"
-                  type="url"
-                />
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <Label htmlFor="afficheUrl">Affiche du tournoi</Label>
+                <UploadAffiche onUpload={(url) => setAfficheUrl(url)} />
+                {afficheUrl && (
+                  <Image
+                    width={200}
+                    height={400}
+                    src={afficheUrl}
+                    alt="Affiche enregistrée"
+                    className="max-w-xs mt-2"
+                  />
+                )}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="reglement">Règlement du tournoi (PDF)</Label>
+              <div className="space-y-4">
+                <Label htmlFor="reglementUrl">Règlement du tournoi (PDF)</Label>
                 <Input
                   className="placeholder:text-gray-400 mt-2 "
-                  id="reglement"
+                  id="reglementUrl"
+                  name="reglementUrl"
                   type="url"
                   placeholder="Url du reglement"
                 />
@@ -470,6 +482,7 @@ export default function MakeTournoi() {
             </CardContent>
           </Card>
         </TabsContent>
+
         <TabsContent value="epreuves">
           <Card>
             <CardHeader>
@@ -483,8 +496,9 @@ export default function MakeTournoi() {
             <CardContent className="space-y-3">
               <Popover open={openPopover} onOpenChange={setOpenPopover}>
                 <PopoverTrigger asChild>
-                  <Button size="icon" className="rounded-full cursor-pointer">
+                  <Button size={"sm"} className=" cursor-pointer">
                     <Plus />
+                    Ajouter une épreuve
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
@@ -635,7 +649,7 @@ export default function MakeTournoi() {
               </Popover>
 
               {epreuves.length > 0 && (
-                <div className="mt-4 border-t pt-4">
+                <div className="pt-4">
                   <h4 className="font-medium text-sm text-muted-foreground mb-2">
                     Résumé des épreuves :
                   </h4>
