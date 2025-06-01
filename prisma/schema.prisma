@@ -1,5 +1,117 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(uuid())
+  clerkUserId String    @unique
+  name        String
+  email       String
+  image       String?
+  bio         String?
+  website     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  roleId      String
+  joueurs     Joueur[]
+  Tournoi     Tournoi[]
+  role        Role      @relation(fields: [roleId], references: [id])
+}
+
+model Role {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+model InscriptionTournoi {
+  id        Int      @id @default(autoincrement())
+  joueurId  Int
+  tournoiId Int
+  createdAt DateTime @default(now())
+  joueur    Joueur   @relation(fields: [joueurId], references: [id], onDelete: Cascade)
+  tournoi   Tournoi  @relation(fields: [tournoiId], references: [id], onDelete: Cascade)
+
+  @@unique([joueurId, tournoiId])
+}
+
+model Joueur {
+  id                  Int                  @id @default(autoincrement())
+  dossard             Int                  @unique
+  numeroLicence       String               @unique
+  nom                 String
+  prenom              String
+  email               String?              @unique
+  mobile              String?
+  club                String?
+  pointsOfficiel      Float?
+  userId              String
+  createdAt           DateTime             @default(now())
+  sexe                Int?                 @db.SmallInt
+  engagement          Engagement[]
+  inscriptionsTournoi InscriptionTournoi[]
+  user                User                 @relation(fields: [userId], references: [id])
+}
+
+model Tournoi {
+  id                   Int                  @id @default(autoincrement())
+  nom                  String
+  lieu                 String?
+  description          String?
+  debut                DateTime
+  fin                  DateTime
+  statut               StatutTournoi        @default(BROUILLON)
+  responsableNom       String?
+  responsableEmail     String?
+  responsableTelephone String?
+  afficheUrl           String?
+  reglementUrl         String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  userId               String
+  events               Event[]
+  joueursInscrits      InscriptionTournoi[]
+  user                 User                 @relation(fields: [userId], references: [id])
+}
+
+model Event {
+  id           Int          @id @default(autoincrement())
+  nom          String
+  date         DateTime
+  jour         String
+  heure        String
+  tableau      String
+  categorie    String?
+  minPoints    Int?
+  maxPoints    Int?
+  prixAnticipe Float
+  prixSurPlace Float
+  placesMax    Int?
+  etat         EtatEvent    @default(OUVERT)
+  tournoiId    Int
+  engagements  Engagement[]
+  tournoi      Tournoi      @relation(fields: [tournoiId], references: [id])
+
+  @@unique([date, heure, tableau])
+}
+
+model Engagement {
+  id             Int      @id @default(autoincrement())
+  joueurId       Int
+  eventId        Int
+  dateEngagement DateTime @default(now())
+  modePaiement   String?
+  event          Event    @relation(fields: [eventId], references: [id])
+  joueur         Joueur   @relation(fields: [joueurId], references: [id], onDelete: Cascade)
+
+  @@unique([joueurId, eventId])
+}
+
 enum StatutTournoi {
   BROUILLON
   PUBLIE
@@ -9,122 +121,4 @@ enum EtatEvent {
   OUVERT
   COMPLET
   ANNULE
-}
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL") // Supabase te fournit ça
-}
-
-model User {
-  id            String   @id @default(uuid())
-  clerkUserId  String   @unique
-  name           String
-  email         String
-  image        String?
-  bio String?
-  website String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  roleId String
-  role Role @relation(fields: [roleId], references: [id])
-  joueurs       Joueur[]
-
-  Tournoi Tournoi[]
-}
-
-model Role {
-  id String @id @default(cuid())
-  name String @unique
-  users User[]
-}
-model InscriptionTournoi {
-  id         Int      @id @default(autoincrement())
-  joueurId   Int
-  tournoiId  Int
-  createdAt  DateTime @default(now())
-
-  joueur     Joueur   @relation(fields: [joueurId], references: [id], onDelete: Cascade)
-  tournoi    Tournoi  @relation(fields: [tournoiId], references: [id], onDelete: Cascade)
-
-  @@unique([joueurId, tournoiId]) // empêche double inscription
-}
-
-model Joueur {
-  id             Int      @id @default(autoincrement())
-  dossard        Int   @unique
-  numeroLicence  String @unique
-  nom            String
-  prenom         String
-  email          String?  @unique
-  mobile         String?
-  club           String?
-  pointsOfficiel Float?
-  sexe           String?
-  userId    String  // Ajout du champ userClerkId pour stocker l'ID de l'utilisateur Clerk
-  createdAt      DateTime @default(now())
-
-  engagement Engagement[]
-inscriptionsTournoi InscriptionTournoi[]
-
-  user       User      @relation(fields: [userId], references: [id])
-}
-model Tournoi {
-  id                  Int            @id @default(autoincrement())
-  nom                 String
-  lieu                String?
-  description         String?
-  debut               DateTime
-  fin                 DateTime
-  statut              StatutTournoi  @default(BROUILLON)
-  responsableNom      String?
-  responsableEmail    String?
-  responsableTelephone String?
-  afficheUrl          String?        // URL de l'affiche
-  reglementUrl        String?        // URL du règlement
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  userId              String
-  user                User           @relation(fields: [userId], references: [id])
-  joueursInscrits InscriptionTournoi[]
-
-  events              Event[]
-}
-
-model Event {
-  id            Int           @id @default(autoincrement())
-  nom           String
-  date          DateTime
-  jour          String
-  heure         String
-  tableau       String
-  categorie     String?
-  minPoints     Int?
-  maxPoints     Int?
-  prixAnticipe  Float
-  prixSurPlace  Float
-  placesMax     Int?
-  etat          EtatEvent     @default(OUVERT)
-  tournoiId     Int
-  tournoi       Tournoi       @relation(fields: [tournoiId], references: [id])
-  engagements   Engagement[]
-
-  @@unique([date, heure, tableau])
-}
-
-
-model Engagement {
-  id             Int      @id @default(autoincrement())
-  joueurId       Int
-  joueur         Joueur   @relation(fields: [joueurId], references: [id], onDelete: Cascade)
-  eventId        Int
-  event          Event    @relation(fields: [eventId], references: [id])
-  dateEngagement DateTime @default(now()) // Date de l'engagement
-  modePaiement   String?  // "Anticipé" ou "Sur place" (optionnel, peut être géré autrement)
-
-  @@unique([joueurId, eventId]) // Un joueur ne peut s'engager qu'une seule fois au même événement
 }

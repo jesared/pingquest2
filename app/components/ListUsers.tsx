@@ -22,7 +22,11 @@ export default function ListUsers() {
 
   const fetchAllUsers = async () => {
     try {
-      const res = await fetch("/api/getAllUsers", { method: "GET" });
+      const res = await fetch("/api/getAllUsers", {
+        method: "GET",
+        cache: "no-store",
+      });
+      console.log("Status:", res.status);
       if (!res.ok) {
         throw new Error("Errur lors de la récupération des utilisateurs");
       }
@@ -36,6 +40,8 @@ export default function ListUsers() {
   useEffect(() => {
     fetchAllUsers();
   }, []);
+
+  console.log("Users trouvés :", users.length);
 
   return (
     <Card className="mt-2">
