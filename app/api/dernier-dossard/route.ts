@@ -1,8 +1,7 @@
-import { getPrismaClient } from "@/lib/prisma"; // adapte selon ton setup DB
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const prisma = getPrismaClient();
   try {
     const dernierJoueur = await prisma.joueur.findFirst({
       orderBy: { dossard: "desc" }, // Le joueur avec le plus grand dossard

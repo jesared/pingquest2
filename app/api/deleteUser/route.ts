@@ -1,11 +1,9 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(request: NextRequest) {
   const { id } = await request.json();
-
-  const prisma = getPrismaClient();
 
   const { userId: authenticatedUserId } = getAuth(request);
 

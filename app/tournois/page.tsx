@@ -1,10 +1,9 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/services/dbActions";
 import { auth } from "@clerk/nextjs/server";
 import ListTournois from "../components/ListTounois";
 
 export default async function Tournois() {
-  const prisma = getPrismaClient();
   const { userId } = await auth();
   const user = await getUserId(userId as string);
 

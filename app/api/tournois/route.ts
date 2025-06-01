@@ -1,9 +1,8 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const prisma = getPrismaClient();
     const body = await req.json();
 
     // Validation des épreuves
@@ -98,8 +97,6 @@ export async function POST(req: Request) {
 }
 export async function GET() {
   try {
-    const prisma = getPrismaClient();
-
     const tournois = await prisma.tournoi.findMany({
       where: {
         statut: "PUBLIE",

@@ -1,4 +1,4 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -8,8 +8,6 @@ export async function GET(
   try {
     // Validation des paramètres
     const { id } = await context.params;
-
-    const prisma = getPrismaClient();
 
     const tournoi = await prisma.tournoi.findUnique({
       where: { id: parseInt(id) },
@@ -54,8 +52,6 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-
-  const prisma = getPrismaClient();
 
   try {
     const body = await req.json();

@@ -1,8 +1,7 @@
-import { getPrismaClient } from "@/lib/prisma"; // Assure-toi que ce chemin correspond à ton fichier Prisma
+import { prisma } from "@/lib/prisma"; // Assure-toi que ce chemin correspond à ton fichier Prisma
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  prisma = getPrismaClient();
   try {
     const body = await req.json();
     const { userId } = body;

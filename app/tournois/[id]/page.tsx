@@ -6,7 +6,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/services/dbActions";
 import { auth } from "@clerk/nextjs/server";
 import { EditIcon, MapPinned, PenTool } from "lucide-react";
@@ -20,7 +20,6 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { userId } = await auth();
-  const prisma = getPrismaClient();
 
   // Utilisez getUserId et gérez le cas où l'utilisateur n'est pas authentifié
   const user = userId ? await getUserId(userId) : null;

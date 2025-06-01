@@ -1,9 +1,7 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-  const prisma = getPrismaClient();
-
   const { searchParams } = new URL(req.url);
 
   const tournoiIdParam = searchParams.get("tournoiId");

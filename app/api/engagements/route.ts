@@ -1,9 +1,7 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const prisma = getPrismaClient();
-
   try {
     const data = await req.json();
     const { joueurId, tournoiId, eventIds } = data;

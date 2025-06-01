@@ -1,9 +1,7 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const prisma = getPrismaClient();
-
   try {
     const joueurs = await prisma.joueur.findMany({
       select: {

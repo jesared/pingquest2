@@ -1,10 +1,9 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export async function verifJoueurTournoi(
   tournoiId: number,
   numeroLicence: string
 ) {
-  const prisma = getPrismaClient();
   // Vérifie si le joueur existe
   const joueur = await prisma.joueur.findUnique({
     where: { numeroLicence },

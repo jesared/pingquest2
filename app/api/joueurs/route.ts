@@ -1,7 +1,8 @@
 // api/joueurs/route.ts
 
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+
 import { NextResponse } from "next/server";
 import * as yup from "yup";
 
@@ -22,7 +23,7 @@ const joueurSchema = yup.object({
 
 export async function POST(request: Request) {
   const { userId: clerkUserId } = await auth(); // Renommer pour plus de clarté
-  const prisma = getPrismaClient();
+
   const data = await request.json();
 
   if (!clerkUserId) {
@@ -82,12 +83,6 @@ export async function POST(request: Request) {
 
 export async function GET() {
   const { userId: clerkUserId } = await auth();
-
-  const prisma = getPrismaClient();
-
-  // if (!userId) {
-  //   return NextResponse.json({ joueurs: [] }, { status: 200 });
-  // }
 
   try {
     const existingUser = await prisma.user.findUnique({

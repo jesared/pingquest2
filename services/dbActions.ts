@@ -1,4 +1,4 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export const addUserToDatabase = async (
   clerkUserId: string,
@@ -6,8 +6,6 @@ export const addUserToDatabase = async (
   email: string,
   image: string
 ) => {
-  const prisma = getPrismaClient();
-
   try {
     const role = await prisma.role.findUnique({
       where: { name: "member" },
@@ -40,7 +38,6 @@ export const addUserToDatabase = async (
 };
 
 export const getRole = async (clerkUserId: string) => {
-  const prisma = getPrismaClient();
   try {
     const user = await prisma.user.findUnique({
       where: { clerkUserId },
@@ -56,7 +53,6 @@ export const getRole = async (clerkUserId: string) => {
 };
 
 export const getUserId = async (clerkUserId: string) => {
-  const prisma = getPrismaClient();
   try {
     const user = await prisma.user.findUnique({
       where: { clerkUserId },
@@ -73,7 +69,6 @@ export const getUserId = async (clerkUserId: string) => {
 };
 
 export async function getTournoisByOrganisateur(clerkUserId: string) {
-  const prisma = getPrismaClient();
   const user = await getUserId(clerkUserId);
   const tournois = await prisma.tournoi.findMany({
     where: {

@@ -1,11 +1,9 @@
 // app/api/getUser/route.ts
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function POST() {
-  const prisma = getPrismaClient();
-
   const { userId } = await auth();
 
   if (!userId) {

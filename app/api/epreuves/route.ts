@@ -1,8 +1,7 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const prisma = getPrismaClient();
   const body = await req.json();
   const {
     nom,
@@ -56,8 +55,6 @@ export async function POST(req: Request) {
   return NextResponse.json(created);
 }
 export async function GET(req: Request) {
-  const prisma = getPrismaClient();
-
   const { searchParams } = new URL(req.url);
   const tournoiIdParam = searchParams.get("tournoiId");
   const tournoiId = tournoiIdParam ? parseInt(tournoiIdParam) : null;

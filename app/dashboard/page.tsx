@@ -1,4 +1,4 @@
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { addUserToDatabase, getRole } from "@/services/dbActions";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -8,7 +8,6 @@ import GetInscriptions from "../components/GetInscriptions";
 import ListTournois from "../components/ListTounois";
 import ListUsers from "../components/ListUsers";
 export default async function DashBoardUser() {
-  const prisma = getPrismaClient();
   const { userId } = await auth();
   if (!userId) return redirect("/");
 

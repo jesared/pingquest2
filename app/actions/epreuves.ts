@@ -1,9 +1,8 @@
 // actions/epreuves.ts
 
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export async function getEpreuvesByTournoiId(tournoiId: string) {
-  const prisma = getPrismaClient();
   try {
     const epreuves = await prisma.event.findMany({
       where: {

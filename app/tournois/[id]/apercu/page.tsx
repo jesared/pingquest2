@@ -7,7 +7,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { getPrismaClient } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
+
 import { getUserId } from "@/services/dbActions";
 import { auth } from "@clerk/nextjs/server";
 import { EditIcon, MapPinned, PenTool } from "lucide-react";
@@ -20,7 +21,7 @@ export default async function ApercuTournoiPage(context: {
 }) {
   const { id } = await context.params;
   const tournoiId = Number(id);
-  const prisma = getPrismaClient();
+
   const { userId } = await auth();
   const user = userId ? await getUserId(userId) : null;
   const userIdTournoi = user?.id;
