@@ -24,7 +24,7 @@ export default function JourEpreuvesSelector({
         const epreuvesDuJour = epreuves.filter(
           (e) => e.jour.toLowerCase() === jourNorm
         );
-
+        console.log("jour", jour, "epreuvesDuJour", epreuvesDuJour);
         return (
           <div key={`${jour}-${i}`}>
             <h3 className="text-lg font-semibold mb-2">{jour}</h3>

@@ -39,8 +39,6 @@ export async function GET(req: NextRequest) {
       explicitArray: false,
     });
 
-    // Extraction du sexe
-
     const joueur = result_licence_b?.liste?.licence || null;
 
     if (!joueur) {

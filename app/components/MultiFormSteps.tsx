@@ -24,12 +24,17 @@ const steps = [
 interface MultiStepFormProps {
   tournoiId: number;
   jours: string[];
-  onFfttJoueurDetecte?: (joueur: { nom: string; prenom: string }) => void;
+  onFfttJoueurDetecte?: (joueur: {
+    nom: string;
+    prenom: string;
+    points: number;
+    sexe?: string;
+  }) => void;
 }
 
 export default function MultiStepForm({
   tournoiId,
-  jours,
+
   onFfttJoueurDetecte,
 }: MultiStepFormProps) {
   const { user } = useUser(); // 👈 Récupération du currentUser Clerk
@@ -84,7 +89,7 @@ export default function MultiStepForm({
       );
 
       const data = await response.json();
-      console.log("data", data);
+
       if (!response.ok) {
         // ⚡ Ici, si le serveur renvoie une erreur (400 ou 404)
         if (data.error) {
@@ -106,7 +111,12 @@ export default function MultiStepForm({
         setValue("sexe", data.sexe || "");
 
         if (onFfttJoueurDetecte) {
-          onFfttJoueurDetecte({ nom: data.nom, prenom: data.prenom });
+          onFfttJoueurDetecte({
+            nom: data.nom,
+            prenom: data.prenom,
+            points: data.pointsOfficiel,
+            sexe: data.sexe,
+          });
         }
         setLicenceVerrouillee(true); // ➡️ On verrouille le champ
         toast.success(`Joueur trouvé : ${data.nom} ${data.prenom}`); // 🎉 Petit succès
@@ -172,7 +182,7 @@ export default function MultiStepForm({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(joueurData),
         });
-
+        console.log("joueurData", joueurData);
         if (!response.ok)
           throw new Error("Erreur lors de la création du joueur");
 
@@ -238,7 +248,6 @@ export default function MultiStepForm({
         const points = parseInt(watch("pointsOfficiel") || "0", 10);
 
         const res = await fetch(`/api/epreuves?tournoiId=${tournoiId}`);
-
         // 👈 Ton endpoint API qui sort les épreuves
         if (!res.ok) {
           console.error(`Erreur HTTP: ${res.status}`);
@@ -252,7 +261,7 @@ export default function MultiStepForm({
         if (!Array.isArray(allEpreuves)) {
           throw new Error("Le format des épreuves est invalide");
         }
-        console.log("first", allEpreuves);
+
         const accessibles = allEpreuves.filter(
           (e: { minPoints: number; maxPoints: number }) => {
             return points >= e.minPoints && points <= e.maxPoints;
@@ -272,7 +281,9 @@ export default function MultiStepForm({
       fetchEpreuves();
     }
   }, [step, watch, tournoiId]);
-
+  const joursDispos = Array.from(
+    new Set(epreuves.map((e) => (e.jour || "").trim()))
+  );
   const validateStep = async (nextStep: number) => {
     const fieldMap: Record<number, (keyof FormData)[]> = {
       1: ["numeroLicence", "nom", "prenom"],
@@ -415,7 +426,7 @@ export default function MultiStepForm({
                   ) : (
                     <>
                       <JourEpreuvesSelector
-                        jours={jours}
+                        jours={joursDispos}
                         epreuves={epreuves}
                         register={register}
                       />

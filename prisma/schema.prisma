@@ -64,6 +64,7 @@ model Joueur {
   mobile         String?
   club           String?
   pointsOfficiel Float?
+  sexe           String?
   userId    String  // Ajout du champ userClerkId pour stocker l'ID de l'utilisateur Clerk
   createdAt      DateTime @default(now())
 

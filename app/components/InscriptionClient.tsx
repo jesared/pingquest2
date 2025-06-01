@@ -18,6 +18,8 @@ export default function InscriptionClient({
   const [joueurFTT, setJoueurFTT] = useState<{
     nom: string;
     prenom: string;
+    points: number;
+    sexe: string;
   } | null>(null);
 
   return (
@@ -28,7 +30,8 @@ export default function InscriptionClient({
         <p className="text-gray-500">Inscrire un joueur</p>
         {joueurFTT && (
           <div className="text-sm text-gray-700 font-medium">
-            {joueurFTT.prenom} {joueurFTT.nom}
+            {joueurFTT.prenom} {joueurFTT.nom} {joueurFTT.points}{" "}
+            {joueurFTT.sexe}
           </div>
         )}
       </div>
@@ -36,7 +39,12 @@ export default function InscriptionClient({
       <MultiStepForm
         tournoiId={tournoi.id}
         jours={jours}
-        onFfttJoueurDetecte={setJoueurFTT}
+        onFfttJoueurDetecte={(joueur) =>
+          setJoueurFTT({
+            ...joueur,
+            sexe: joueur.sexe || "N/A",
+          })
+        }
       />
     </div>
   );

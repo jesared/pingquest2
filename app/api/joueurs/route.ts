@@ -15,6 +15,7 @@ const joueurSchema = yup.object({
   mobile: yup.string().optional(),
   club: yup.string().optional(),
   pointsOfficiel: yup.number().optional(),
+  sexe: yup.string().optional(),
   userId: yup.string().optional(), // L'ID Clerk peut être optionnel à la création (géré par le backend)
   epreuves: yup.array().of(yup.string()).optional(), // Validation des épreuves (optionnel)
 });
@@ -58,7 +59,10 @@ export async function POST(request: Request) {
         mobile: data.mobile || null,
         club: data.club || null,
         dossard: data.dossard ?? null,
-        pointsOfficiel: data.pointsOfficiel ?? null,
+        pointsOfficiel: data.pointsOfficiel
+          ? parseFloat(data.pointsOfficiel)
+          : null,
+
         userId: existingUser.id, // Utiliser l'ID de notre table User
       },
     });
