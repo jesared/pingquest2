@@ -2,18 +2,13 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { Epreuve } from "@/types/engagement";
 import { UseFormRegister } from "react-hook-form";
-
-type Epreuve = {
-  id: string;
-  jour: string;
-  tableau: string;
-  categorie: string;
-};
 
 type Props = {
   jours: string[];
   epreuves: Epreuve[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<any>;
 };
 

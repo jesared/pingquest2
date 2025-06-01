@@ -1,3 +1,5 @@
+// api/joueurs/route.ts
+
 import { getPrismaClient } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -51,14 +53,12 @@ export async function POST(request: Request) {
         numeroLicence: data.numeroLicence,
         nom: data.nom,
         prenom: data.prenom,
-        dossard: data.dossard || null,
+
         email: data.email || null,
         mobile: data.mobile || null,
         club: data.club || null,
-        pointsOfficiel:
-          data.pointsOfficiel !== undefined
-            ? parseFloat(data.pointsOfficiel as string)
-            : null,
+        dossard: data.dossard ?? null,
+        pointsOfficiel: data.pointsOfficiel ?? null,
         userId: existingUser.id, // Utiliser l'ID de notre table User
       },
     });
@@ -78,12 +78,12 @@ export async function POST(request: Request) {
 
 export async function GET() {
   const { userId: clerkUserId } = await auth();
-  const { userId } = await auth(); // Récupère l'ID Clerk
+
   const prisma = getPrismaClient();
 
-  if (!userId) {
-    return NextResponse.json({ joueurs: [] }, { status: 200 });
-  }
+  // if (!userId) {
+  //   return NextResponse.json({ joueurs: [] }, { status: 200 });
+  // }
 
   try {
     const existingUser = await prisma.user.findUnique({
@@ -108,8 +108,8 @@ export async function GET() {
               select: {
                 id: true,
                 tableau: true,
+                categorie: true,
                 tournoi: {
-                  // 👈 ajoute ceci !
                   select: { id: true, nom: true },
                 },
               },
@@ -119,7 +119,7 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({ joueurs }, { status: 200 });
+    return NextResponse.json({ joueurs: joueurs ?? [] }, { status: 200 });
   } catch (error) {
     console.error("Erreur lors de la récupération des joueurs :", error);
     return NextResponse.json(

@@ -119,7 +119,7 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(tournois);
+    return NextResponse.json({ tournois });
   } catch (err) {
     console.error("Erreur lors de la récupération des tournois:", err);
     return NextResponse.json(

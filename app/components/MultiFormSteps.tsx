@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Epreuve } from "@/types/engagement";
 import { useUser } from "@clerk/nextjs";
 import confetti from "canvas-confetti";
 import { Loader2 } from "lucide-react";
@@ -39,16 +40,6 @@ export default function MultiStepForm({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  interface Epreuve {
-    categorie: string;
-    tableau: string;
-    id: string;
-    nom: string;
-    jour: string;
-    minPoints: number;
-    maxPoints: number;
-    epreuves: string[];
-  }
   const [successMessage, setSuccessMessage] = useState(false);
 
   const [epreuves, setEpreuves] = useState<Epreuve[]>([]);
@@ -93,7 +84,7 @@ export default function MultiStepForm({
       );
 
       const data = await response.json();
-
+      console.log("data", data);
       if (!response.ok) {
         // ⚡ Ici, si le serveur renvoie une erreur (400 ou 404)
         if (data.error) {
@@ -112,6 +103,8 @@ export default function MultiStepForm({
         setValue("club", data.club || "");
         setValue("pointsOfficiel", data.pointsOfficiel || "");
         setValue("dossard", data.dossard || "");
+        setValue("sexe", data.sexe || "");
+
         if (onFfttJoueurDetecte) {
           onFfttJoueurDetecte({ nom: data.nom, prenom: data.prenom });
         }
@@ -142,6 +135,8 @@ export default function MultiStepForm({
       dossard: "",
       nom: "",
       prenom: "",
+      sexe: "",
+      pointsOfficiel: "",
       epreuves: [],
     },
   });
@@ -184,14 +179,12 @@ export default function MultiStepForm({
         const nouveauJoueur = await response.json();
         joueurId = nouveauJoueur.joueur.id;
       }
-      const selectedIds = watch("epreuves") || [];
 
+      const selectedIds = watch("epreuves") || [];
       // ⚠️ Vérifie que chaque ID sélectionné correspond à une épreuve autorisée
       const invalidSelections = selectedIds.filter((id) => {
-        const epreuve = epreuves.find(
-          (e) => e.id === id || e.id.toString() === id
-        );
-        return !epreuve; // l'ID ne correspond à aucune épreuve accessible
+        const epreuve = epreuves.find((e) => String(e.id) === String(id));
+        return !epreuve;
       });
 
       if (invalidSelections.length > 0) {
@@ -200,12 +193,20 @@ export default function MultiStepForm({
         );
         return;
       }
-      const engagements = epreuves
-        .filter((e) => e.id !== undefined && !isNaN(Number(e.id)))
-        .map((e) => ({
-          eventId: Number(e.id),
-          modePaiement: "Anticipé",
-        }));
+
+      const engagements = selectedIds
+        .map((id) => {
+          const epreuve = epreuves.find((e) => String(e.id) === String(id));
+          if (!epreuve) return null;
+          const n = Number(epreuve.id);
+          if (!n || isNaN(n)) return null;
+          return {
+            eventId: n,
+            modePaiement: "Anticipé",
+            tournoiId,
+          };
+        })
+        .filter(Boolean);
 
       if (engagements.length === 0) {
         throw new Error("Aucune épreuve valide sélectionnée.");
@@ -214,7 +215,7 @@ export default function MultiStepForm({
       const res = await fetch("/api/engagements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ joueurId, engagements }),
+        body: JSON.stringify({ joueurId, tournoiId, eventIds: engagements }), // ✅
       });
 
       if (!res.ok) {
@@ -336,6 +337,7 @@ export default function MultiStepForm({
                       setValue("prenom", "");
                       setValue("club", "");
                       setValue("pointsOfficiel", "");
+                      setValue("sexe", "");
                     }}
                     className="text-xs px-2 py-1"
                     size={"sm"}
@@ -461,6 +463,15 @@ export default function MultiStepForm({
                         <span className="text-gray-400">Prénom: </span>
                         {watch("prenom")}
                       </p>
+                      <p>
+                        <span className="text-gray-400">Sexe: </span>
+                        {watch("sexe") === "M"
+                          ? "Masculin"
+                          : watch("sexe") === "F"
+                          ? "Féminin"
+                          : ""}
+                      </p>
+
                       <p>
                         <span className="text-gray-400">Club: </span>
                         {watch("club")}

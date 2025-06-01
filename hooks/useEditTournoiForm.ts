@@ -95,6 +95,8 @@ export const useEditTournoiForm = (tournoiId: number) => {
           id: tournoiData.id,
           nom: tournoiData.nom || "",
           lieu: tournoiData.lieu || "",
+          afficheUrl: tournoiData.afficheUrl || "",
+          reglementUrl: tournoiData.reglementUrl || "",
           description: tournoiData.description || "",
           responsableNom: tournoiData.responsableNom || "",
           email: tournoiData.responsableEmail || "",
@@ -133,6 +135,14 @@ export const useEditTournoiForm = (tournoiId: number) => {
 
   const handleNewEpreuveChange = (field: keyof Epreuve, value: string) => {
     setNewEpreuve((prev) => ({ ...prev, [field]: value }));
+  };
+  const updateAfficheUrl = (newUrl: string) => {
+    setFormValues((prev) => ({ ...prev, afficheUrl: newUrl }));
+    setIsFormModified(true);
+  };
+  const updateReglementUrl = (newUrl: string) => {
+    setFormValues((prev) => ({ ...prev, reglementUrl: newUrl }));
+    setIsFormModified(true);
   };
 
   const addEpreuve = () => {
@@ -230,6 +240,8 @@ export const useEditTournoiForm = (tournoiId: number) => {
         responsableTelephone: formValues.telephone,
         debut: formValues.startDate?.toISOString(),
         fin: formValues.endDate?.toISOString(),
+        afficheUrl: formValues.afficheUrl,
+        reglementUrl: formValues.reglementUrl,
       };
 
       await fetch(`/api/tournois/${tournoiId}`, {
@@ -322,6 +334,8 @@ export const useEditTournoiForm = (tournoiId: number) => {
   return {
     formValues,
     updateField,
+    updateAfficheUrl,
+    updateReglementUrl,
     handleNewEpreuveChange,
     newEpreuve,
     addEpreuve,

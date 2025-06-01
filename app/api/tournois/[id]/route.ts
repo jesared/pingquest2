@@ -66,6 +66,7 @@ export async function PUT(
       description,
       statut,
       afficheUrl,
+      reglementUrl,
       responsableNom,
       responsableEmail,
       responsableTelephone,
@@ -82,6 +83,7 @@ export async function PUT(
     if (description !== undefined) dataToUpdate.description = description;
     if (statut !== undefined) dataToUpdate.statut = statut;
     if (afficheUrl !== undefined) dataToUpdate.afficheUrl = afficheUrl;
+    if (reglementUrl !== undefined) dataToUpdate.reglementUrl = reglementUrl;
     if (responsableNom !== undefined)
       dataToUpdate.responsableNom = responsableNom;
     if (responsableEmail !== undefined)

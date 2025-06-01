@@ -8,7 +8,7 @@ import { useAuth } from "@clerk/nextjs";
 import { createClient } from "@supabase/supabase-js";
 import { X } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const supabase = createClient(
@@ -31,6 +31,11 @@ export default function UploadDocument({
   const [url, setUrl] = useState(initialUrl); // Ajout url pour gérer l’état du doc en ligne
   const [filePath, setFilePath] = useState<string | null>(null);
 
+  useEffect(() => {
+    setUrl(url || "");
+    setPreviewName(null);
+    // reset les états internes si url change
+  }, [url]);
   // Choix du fichier
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -56,8 +61,13 @@ export default function UploadDocument({
     if (!file) return;
     setUploading(true);
 
+    // const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    // const filePath = `${Date.now()}_${sanitizedFileName}`;
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-    const filePath = `reglement/${Date.now()}_${sanitizedFileName}`;
+    let filePath = `${Date.now()}_${sanitizedFileName}`;
+
+    filePath = filePath.replace(/^\/+/, ""); // SÉCURITÉ anti-slash
+
     const { error } = await authedSupabase.storage
       .from("reglement")
       .upload(filePath, file);
@@ -116,7 +126,7 @@ export default function UploadDocument({
         variant={"secondary"}
         className="cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
-        disabled={uploading}
+        disabled={uploading || (!!url && !previewName)}
         size="sm"
       >
         {uploading ? "Upload en cours..." : "Choisir un PDF"}

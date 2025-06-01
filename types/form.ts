@@ -6,6 +6,7 @@ export interface FormData {
   club: string;
   pointsOfficiel: string;
   epreuves?: string[];
+  sexe?: string;
 }
 
 export const jobOptions = [

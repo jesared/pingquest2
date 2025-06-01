@@ -4,11 +4,12 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { deleteSupabaseFile } from "@/lib/deleteSupabaseFile";
+
 import { useAuth } from "@clerk/nextjs";
 import { createClient } from "@supabase/supabase-js";
 import { AlertCircle, X } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 // Crée une instance Supabase SANS authentification globale
 const supabase = createClient(
@@ -16,9 +17,25 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+export function getFilePathFromUrl(url: string): string | null {
+  // Capture après /object/public/affiche/
+  const m = url.match(/\/object\/public\/affiche\/(.+)$/);
+  if (!m) return null;
+  const filePath = m[1];
+
+  // Toujours préfixer par "affiche/" si ce n’est pas déjà le cas
+  // if (!filePath.startsWith("affiche/")) {
+  //   filePath = `affiche/${filePath}`;
+  // }
+  return filePath;
+}
+
 export default function UploadAffiche({
   onUpload,
+  url: initialUrl = "",
 }: {
+  url?: string;
   onUpload: (url: string) => void;
 }) {
   const { getToken } = useAuth();
@@ -28,7 +45,7 @@ export default function UploadAffiche({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [filePath, setFilePath] = useState<string | null>(null);
-  const [url, setUrl] = useState<string>("");
+  const [url, setUrl] = useState<string>(initialUrl);
   const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,8 +86,14 @@ export default function UploadAffiche({
     if (!file) return;
 
     setUploading(true);
+    // const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    // const filePath = `${Date.now()}${sanitizedFileName}`;
+
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-    const filePath = `affiche/${Date.now()}_${sanitizedFileName}`;
+    let filePath = `${Date.now()}_${sanitizedFileName}`;
+
+    filePath = filePath.replace(/^\/+/, ""); // SÉCURITÉ anti-slash
+
     const { error } = await authedSupabase.storage
       .from("affiche")
       .upload(filePath, file);
@@ -87,23 +110,41 @@ export default function UploadAffiche({
       setFilePath(filePath);
       if (fileInputRef.current) fileInputRef.current.value = "";
       setPreview(null);
+      toast.success("Affiche uploadée !");
     }
     setUploading(false);
   };
   // --- SUPPRESSION ---
   const handleDelete = async () => {
-    console.log("filePath", filePath);
-    if (filePath) {
-      await deleteSupabaseFile("affiche", filePath);
+    const pathToDelete = filePath || (url ? getFilePathFromUrl(url) : null);
+
+    if (pathToDelete) {
+      await deleteSupabaseFile("affiche", pathToDelete);
+
       toast.success("Affiche supprimée !");
     }
+
     setPreview(null);
     setUrl("");
     setFilePath(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     onUpload(""); // Reset dans le parent
   };
-  console.log("preview:", preview, "url:", url);
+
+  useEffect(() => {
+    // Synchronise l’url affichée, le filePath, et retire le preview dès qu'une nouvelle url arrive
+    setUrl(url || "");
+    setPreview(null);
+    if (url) {
+      const filePath = getFilePathFromUrl(url);
+      // const filePath = rawFilePath ? normalizeFilePath(rawFilePath) : null;
+
+      setFilePath(filePath);
+    } else {
+      setFilePath(null);
+    }
+  }, [url]);
+
   return (
     <div className="flex flex-col gap-3 items-start w-full">
       {/* Choix fichier */}

@@ -2,6 +2,8 @@
 import { ButtonGroup } from "@/app/components/ButtonStatutTournoi";
 // app/components/EditTournoi.tsx
 import DateRangeDisplay from "@/app/components/DateRangeDisplay";
+import UploadAffiche from "@/app/components/UploadAffiche";
+import UploadDocument from "@/app/components/UploadDocument";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -48,11 +50,12 @@ import {
   Binoculars,
   CalendarIcon,
   Edit2,
+  FileImage,
+  FileText,
   MoreVertical,
   Plus,
   Trash,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -74,6 +77,8 @@ const EditTournoi = () => {
   const {
     formValues,
     updateField,
+    updateAfficheUrl,
+    updateReglementUrl,
     handleNewEpreuveChange,
     newEpreuve,
     addEpreuve,
@@ -183,7 +188,6 @@ const EditTournoi = () => {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="dates">
           <Card>
             <CardHeader>
@@ -291,7 +295,6 @@ const EditTournoi = () => {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="contact">
           <Card>
             <CardHeader>
@@ -342,7 +345,6 @@ const EditTournoi = () => {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="fichiers">
           <Card>
             <CardHeader>
@@ -353,53 +355,35 @@ const EditTournoi = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <Label htmlFor="affiche">Affiche du tournoi</Label>
-                {formValues.afficheUrl ? (
-                  <div className="rounded border p-2 w-fit">
-                    <Image
-                      src={formValues.afficheUrl}
-                      alt="Affiche du tournoi"
-                      className="max-w-xs rounded shadow"
-                    />
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-1 bg-gray-50 rounded-lg shadow-lg border p-6 flex flex-col items-center hover:bg-gray-100 transition">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Label htmlFor="afficheUrl">
+                      <FileImage />
+                      <span className="font-bold text-md">
+                        Affiche du tournoi
+                      </span>
+                    </Label>
                   </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Aucune affiche ajoutée pour le moment.
-                  </p>
-                )}
-                {/* Input upload à venir */}
-                <Input
-                  type="file"
-                  id="affiche"
-                  disabled
-                  placeholder="(à venir)"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <Label htmlFor="reglement">Règlement du tournoi (PDF)</Label>
-                {formValues.reglementUrl ? (
-                  <a
-                    href={formValues.reglementUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline text-sm"
-                  >
-                    Télécharger le règlement existant
-                  </a>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Aucun règlement ajouté pour le moment.
-                  </p>
-                )}
-                {/* Input upload à venir */}
-                <Input
-                  type="file"
-                  id="reglement"
-                  disabled
-                  placeholder="(à venir)"
-                />
+                  <UploadAffiche
+                    url={formValues.afficheUrl}
+                    onUpload={updateAfficheUrl}
+                  />
+                </div>
+                <div className="flex-1 bg-gray-50 rounded-lg shadow-lg border p-6 flex flex-col items-center hover:bg-gray-100 transition">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Label htmlFor="reglement">
+                      <FileText />
+                      <span className="font-bold text-md">
+                        Règlement du tournoi
+                      </span>
+                    </Label>
+                  </div>
+                  <UploadDocument
+                    url={formValues.reglementUrl}
+                    onUpload={updateReglementUrl}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
